@@ -4,36 +4,34 @@
 """Generic Manim scene engine driven by an EvoluPark YAML scenario.
 
 The launcher in ``render.py`` sets ``EVOLUPARK_SCENARIO`` before invoking Manim.
-This module loads that scenario and interprets character actions, furniture,
-background elements and text, synchronized with cached French voice-over audio.
+This module renders characters, furniture, backgrounds, and text. Narration
+synthesis and caching are implemented separately in ``engine.voice``.
 """
 
-import asyncio
-import hashlib
 import os
 from pathlib import Path
 
-import edge_tts
 import numpy as np
 import yaml
 from manim import (
+    DOWN,
     Line,
     Rectangle,
+    RIGHT,
     Scene,
     SVGMobject,
     Text,
+    UL,
+    UP,
+    UR,
     Write,
     config,
     linear,
 )
-from manim import DOWN, UP, LEFT, RIGHT, UL, UR
-from mutagen.mp3 import MP3
+from engine.voice import generate_voice
 
 
 ROOT = Path(__file__).resolve().parent.parent
-AUDIO_CACHE = ROOT / ".cache" / "voice"
-AUDIO_CACHE.mkdir(parents=True, exist_ok=True)
-
 SCENARIO_ENV = os.environ.get("EVOLUPARK_SCENARIO")
 if not SCENARIO_ENV:
     raise RuntimeError(
@@ -46,29 +44,6 @@ with SCENARIO.open(encoding="utf-8") as stream:
     cfg = yaml.safe_load(stream)
 if not isinstance(cfg, dict):
     raise ValueError(f"Scenario must contain a YAML mapping: {SCENARIO}")
-
-
-def generate_voice(text):
-    """Generate or reuse an Edge TTS MP3 and return its path and duration."""
-    text = " ".join(text.split())
-    voice = cfg["voice"]["name"]
-    rate = cfg["voice"].get("rate", "+0%")
-    cache_key = f"{voice}|{rate}|{text}"
-    digest = hashlib.sha256(cache_key.encode("utf-8")).hexdigest()[:16]
-    path = AUDIO_CACHE / f"{digest}.mp3"
-
-    if not path.is_file() or path.stat().st_size == 0:
-        async def synthesize():
-            """Request the narration audio asynchronously from Edge TTS."""
-            await edge_tts.Communicate(text=text, voice=voice, rate=rate).save(str(path))
-
-        try:
-            asyncio.run(synthesize())
-        except Exception:
-            path.unlink(missing_ok=True)
-            raise
-
-    return path, MP3(str(path)).info.length
 
 
 def load_svg(relative_path, height, native_facing="right", facing="right"):
@@ -363,7 +338,7 @@ class EvoluParkScene(Scene):
         """Synchronize each action with its narration without fading SVG layers."""
         narration = sequence.get("narration", "").strip()
         if narration:
-            audio_path, duration = generate_voice(narration)
+            audio_path, duration = generate_voice(narration, cfg["voice"])
             self.add_sound(str(audio_path))
         else:
             duration = float(sequence.get("duration", 2.0))

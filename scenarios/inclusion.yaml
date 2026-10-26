@@ -17,8 +17,15 @@ logo:
   width: 1.65
 
 voice:
-  name: "fr-FR-VivienneMultilingualNeural"
+  local: false
+  name: fr-FR-VivienneMultilingualNeural
   rate: "-5%"
+
+#voice:
+#  local: true
+#  model: fr_FR-siwis-medium
+#  length_scale: 1.05
+#  speaker: 0
 
 characters:
   patient:
