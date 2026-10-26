@@ -23,6 +23,7 @@ from manim import (
     Text,
     UL,
     UP,
+    UpdateFromAlphaFunc,
     UR,
     Write,
     config,
@@ -30,6 +31,10 @@ from manim import (
 )
 from engine.voice import generate_voice
 
+
+# ==============================================================================
+# Constants
+# ==============================================================================
 
 ROOT = Path(__file__).resolve().parent.parent
 SCENARIO_ENV = os.environ.get("EVOLUPARK_SCENARIO")
@@ -45,6 +50,10 @@ with SCENARIO.open(encoding="utf-8") as stream:
 if not isinstance(cfg, dict):
     raise ValueError(f"Scenario must contain a YAML mapping: {SCENARIO}")
 
+
+# ==============================================================================
+# Image loading
+# ==============================================================================
 
 def load_svg(relative_path, height, native_facing="right", facing="right"):
     """Load a colored SVG and optionally mirror it to face the other way."""
@@ -63,18 +72,33 @@ def load_svg(relative_path, height, native_facing="right", facing="right"):
 
 
 def load_character(name, pose, facing):
-    """Load the configured SVG pose and requested orientation of a character."""
+    """Load a character SVG for the requested pose.
+
+    For walking, use the first frame of the walking cycle.
+    Other poses are loaded from the standard poses dictionary.
+    """
     spec = cfg["characters"][name]
+
+    if pose == "walking" and spec.get("walking_frames"):
+        path = spec["walking_frames"][0]
+    else:
+        path = spec["poses"][pose]
+
     native = spec.get("native_facing", "right")
     if isinstance(native, dict):
         native = native.get(pose, "right")
+
     return load_svg(
-        spec["poses"][pose],
+        path,
         spec.get("heights", {}).get(pose, 3.5),
         native_facing=native,
         facing=facing,
     )
 
+
+# ==============================================================================
+# Graphic utility functions
+# ==============================================================================
 
 def place_bottom(obj, x, bottom_y):
     """Move an object to horizontal center ``x`` and bottom position ``bottom_y``."""
@@ -96,6 +120,10 @@ def anchor_point(obj, anchor, flipped=False):
         0.0,
     ])
 
+
+# ==============================================================================
+# EvoluParkScene class
+# ==============================================================================
 
 class EvoluParkScene(Scene):
     """Render a YAML-defined EvoluPark scene with characters and narration."""
@@ -221,6 +249,94 @@ class EvoluParkScene(Scene):
                 "flipped": flipped,
             }
 
+    def animate_walk(
+        self,
+        obj,
+        name,
+        facing,
+        start_x,
+        end_x,
+        bottom_y,
+        run_time,
+    ):
+        """Animate a character walking along a horizontal path.
+
+        Cycle through preloaded SVG poses based on the distance traveled.
+        If no walking frames are configured, fall back to a simple slide.
+
+        Args:
+            obj: Character mobject currently on stage.
+            name: Character identifier in the YAML configuration.
+            facing: Direction in which the character is facing.
+            start_x: Starting horizontal position.
+            end_x: Target horizontal position.
+            bottom_y: Vertical position of the character's feet.
+            run_time: Total duration of the animation.
+        """
+        spec = cfg["characters"][name]
+        paths = spec.get("walking_frames", [])
+
+        if len(paths) < 2:
+            self.play(
+                obj.animate.shift((end_x - start_x) * RIGHT),
+                run_time=run_time,
+                rate_func=linear,
+            )
+            return
+
+        native = spec.get("native_facing", "right")
+        if isinstance(native, dict):
+            native = native.get("walking", "right")
+
+        height = spec.get("heights", {}).get("walking", 3.5)
+
+        # Load SVGs once, not at every animation frame.
+        frames = [
+            load_svg(
+                path,
+                height,
+                native_facing=native,
+                facing=facing,
+            )[0]
+            for path in paths
+        ]
+
+        cycle_length = float(spec.get("walk_cycle_length", 2.0))
+        if cycle_length <= 0:
+            raise ValueError("walk_cycle_length must be positive")
+
+        current_frame = -1
+        frame_count = len(frames)
+        distance = abs(end_x - start_x)
+
+        def update(mob, alpha):
+            """Update the walking pose and horizontal position."""
+            nonlocal current_frame
+
+            x = start_x + alpha * (end_x - start_x)
+            traveled = alpha * distance
+
+            # Repeat the gait cycle according to distance traveled.
+            phase = (traveled / cycle_length) % 1.0
+            frame_index = min(int(phase * frame_count), frame_count - 1)
+
+            # Change the SVG only when the walking pose changes.
+            if frame_index != current_frame:
+                mob.become(frames[frame_index])
+                mob.set_z_index(2)
+                current_frame = frame_index
+
+            place_bottom(mob, x, bottom_y)
+
+        self.play(
+            UpdateFromAlphaFunc(
+                obj,
+                update,
+                run_time=run_time,
+                rate_func=linear,
+            )
+        )
+
     def enter(self, action, run_time):
         """Animate a new character entering the frame from the specified side."""
         name = action["character"]
@@ -242,11 +358,22 @@ class EvoluParkScene(Scene):
         start_x = sign * (config.frame_width / 2 + obj.width / 2 + 0.2)
         place_bottom(obj, start_x, bottom_y)
         self.add(obj)
-        self.play(
-            obj.animate.shift((x - start_x) * RIGHT),
-            run_time=run_time,
-            rate_func=linear,
-        )
+        if pose == "walking":
+            self.animate_walk(
+                obj=obj,
+                name=name,
+                facing=facing,
+                start_x=start_x,
+                end_x=x,
+                bottom_y=bottom_y,
+                run_time=run_time,
+            )
+        else:
+            self.play(
+                obj.animate.shift((x - start_x) * RIGHT),
+                run_time=run_time,
+                rate_func=linear,
+            )
         self.people[name] = {
             "mobject": obj,
             "pose": pose,

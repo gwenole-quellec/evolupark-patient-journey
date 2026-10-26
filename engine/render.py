@@ -21,6 +21,10 @@ import subprocess
 import sys
 
 
+# ==============================================================================
+# Constants
+# ==============================================================================
+
 ROOT = Path(__file__).resolve().parent.parent
 SCENE_FILE = Path(__file__).with_name("scene.py")
 QUALITY_FLAGS = {
@@ -30,25 +34,9 @@ QUALITY_FLAGS = {
 }
 
 
-def parse_arguments(argv=None):
-    """Parse the mandatory scenario name and optional rendering quality."""
-    parser = argparse.ArgumentParser(
-        description="Render an EvoluPark scenario as a narrated MP4 video.",
-    )
-    parser.add_argument(
-        "scenario",
-        help="Scenario name in scenarios/ (e.g., inclusion or inclusion.yaml).",
-    )
-    quality = parser.add_mutually_exclusive_group()
-    quality.add_argument("--low", dest="quality", action="store_const", const="low",
-                         help="Fast, low-resolution preview.")
-    quality.add_argument("--medium", dest="quality", action="store_const", const="medium",
-                         help="Medium-resolution preview (default).")
-    quality.add_argument("--high", dest="quality", action="store_const", const="high",
-                         help="High-resolution final render.")
-    parser.set_defaults(quality="medium")
-    return parser.parse_args(argv)
-
+# ==============================================================================
+# Utility functions
+# ==============================================================================
 
 def resolve_scenario(name):
     """Validate a scenario name and return its absolute YAML file path."""
@@ -72,6 +60,35 @@ def build_command(name, quality):
         str(SCENE_FILE), "EvoluParkScene",
     ]
 
+
+# ==============================================================================
+# Command-line arguments
+# ==============================================================================
+
+def parse_arguments(argv=None):
+    """Parse the mandatory scenario name and optional rendering quality."""
+    parser = argparse.ArgumentParser(
+        description="Render an EvoluPark scenario as a narrated MP4 video.",
+    )
+    parser.add_argument(
+        "scenario",
+        help="Scenario name in scenarios/ (e.g., inclusion or inclusion.yaml).",
+    )
+    quality = parser.add_mutually_exclusive_group()
+    quality.add_argument("--low", dest="quality", action="store_const",
+                         const="low", help="Fast, low-resolution preview.")
+    quality.add_argument("--medium", dest="quality", action="store_const",
+                         const="medium",
+                         help="Medium-resolution preview (default).")
+    quality.add_argument("--high", dest="quality", action="store_const",
+                         const="high", help="High-resolution final render.")
+    parser.set_defaults(quality="medium")
+    return parser.parse_args(argv)
+
+
+# ==============================================================================
+# Main entry point
+# ==============================================================================
 
 def main(argv=None):
     """Launch Manim using the selected YAML file and propagate its exit code."""

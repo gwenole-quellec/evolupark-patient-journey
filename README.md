@@ -3,7 +3,13 @@
 
 # EvoluPark – Patient Journey
 
-Python-based, YAML-driven animations explaining the **EvoluPark clinical study** and the patient journey. The project uses [Manim Community](https://www.manim.community/) for animation, SVG illustrations for characters and environments, and French text-to-speech narration generated with [Edge TTS](https://github.com/rany2/edge-tts).
+Python-based, YAML-driven animations explaining the **EvoluPark clinical study** and the patient journey.
+
+<p align="center">
+  <img src="assets/logo/evolupark.png" width="220">
+</p>
+
+The project uses [Manim Community](https://www.manim.community/) for animation, SVG illustrations for characters and environments, and French text-to-speech narration generated with [Edge TTS](https://github.com/rany2/edge-tts) or [Piper TTS](https://github.com/OHF-voice/piper1-gpl).
 
 Each YAML scenario is rendered as a narrated MP4 video using a shared animation engine. The goal is to create and update educational sequences without writing scene-specific Python code.
 

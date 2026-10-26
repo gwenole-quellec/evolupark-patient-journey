@@ -48,9 +48,17 @@ import edge_tts
 from mutagen.mp3 import MP3
 
 
+# ==============================================================================
+# Constants
+# ==============================================================================
+
 ROOT = Path(__file__).resolve().parent.parent
 AUDIO_CACHE = ROOT / ".cache" / "voice"
 
+
+# ==============================================================================
+# Audio generation
+# ==============================================================================
 
 def generate_voice(text: str, voice_config: dict) -> tuple[Path, float]:
     """Generate or reuse narrated audio with Piper or Edge TTS.

@@ -16,22 +16,21 @@ logo:
   file: "assets/logo/evolupark.svg"
   width: 1.65
 
-voice:
-  local: false
-  name: fr-FR-VivienneMultilingualNeural
-  rate: "-5%"
-
 #voice:
-#  local: true
-#  model: fr_FR-siwis-medium
-#  length_scale: 1.05
-#  speaker: 0
+#  local: false
+#  name: fr-FR-VivienneMultilingualNeural
+#  rate: "-5%"
+
+voice:
+  local: true
+  model: fr_FR-siwis-medium
+  length_scale: 1.05
+  speaker: 0
 
 characters:
   patient:
     native_facing: right
     poses:
-      walking: "assets/characters/patient/walking.svg"
       standing: "assets/characters/patient/standing.svg"
       sitting: "assets/characters/patient/sitting.svg"
     heights:
@@ -41,11 +40,18 @@ characters:
     anchors:
       sitting:
         seat: {x: 0.44, y: 0.29}
+    walking_frames:
+      - "assets/characters/patient/walking1.svg"
+      - "assets/characters/patient/walking2.svg"
+      - "assets/characters/patient/walking3.svg"
+      - "assets/characters/patient/walking4.svg"
+      - "assets/characters/patient/walking5.svg"
+      - "assets/characters/patient/walking6.svg"
+    walk_cycle_length: 2.5
 
   neurologist:
     native_facing: right
     poses:
-      walking: "assets/characters/neurologist/walking.svg"
       standing: "assets/characters/neurologist/standing.svg"
       sitting: "assets/characters/neurologist/sitting.svg"
     heights:
@@ -55,6 +61,14 @@ characters:
     anchors:
       sitting:
         seat: {x: 0.44, y: 0.29}
+    walking_frames:
+      - "assets/characters/neurologist/walking1.svg"
+      - "assets/characters/neurologist/walking2.svg"
+      - "assets/characters/neurologist/walking3.svg"
+      - "assets/characters/neurologist/walking4.svg"
+      - "assets/characters/neurologist/walking5.svg"
+      - "assets/characters/neurologist/walking6.svg"
+    walk_cycle_length: 2.0
 
 furniture:
   chair:
@@ -117,7 +131,7 @@ sequences:
 
   - id: seating
     narration: >
-      Lors de votre visite d'inclusion, vous rencontrez un ou une neurologue au Centre Hospitalier Universitaire de Brest.
+      Lors de votre visite d'inclusion, vous rencontrez une neurologue au Centre Hospitalier Universitaire de Brest.
     actions:
       - action: enter
         character: neurologist
@@ -143,8 +157,8 @@ sequences:
 
   - id: consultation
     narration: >
-      Le ou la neurologue vous présente les objectifs de l'étude, son déroulement et répond à toutes vos questions.
+      La neurologue vous présente les objectifs de l'étude, son déroulement et répond à toutes vos questions.
       Vous disposez du temps nécessaire pour réfléchir avant de décider de participer.
     actions:
       - action: show_text
-        text: "Le neurologue vous présente l'étude."
+        text: "La neurologue vous présente l'étude."
