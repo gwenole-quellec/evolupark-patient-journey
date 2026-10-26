@@ -17,9 +17,9 @@ Each YAML scenario is rendered as a narrated MP4 video using a shared animation 
 
 ### Requirements
 
-- Python 3 and a Python virtual environment
+- Python 3
 - FFmpeg and the system libraries required by Manim
-- Python dependencies listed in `requirements.txt` (including Manim, PyYAML, Edge TTS and Mutagen)
+- Python dependencies listed in `requirements.txt`
 
 On Ubuntu, install the system dependencies if they are not already present:
 
@@ -42,22 +42,16 @@ python -m pip install -r requirements.txt
 Pass the scenario name **without** its `.yaml` extension:
 
 ```bash
-./render.sh inclusion
+python engine/render.py inclusion
 ```
 
 The scenario argument is **required**. The default render quality is **medium**.
 
 ```bash
-./render.sh inclusion --low       # Fast preview (480p, 15 fps)
-./render.sh inclusion --medium    # Standard preview (720p, 30 fps)
-./render.sh inclusion --high      # Final render (1080p, 60 fps)
-./render.sh --help
-```
-
-Alternatively, with the virtual environment activated:
-
-```bash
-python engine/render.py inclusion --high
+python engine/render.py inclusion --low       # Fast preview (480p, 15 fps)
+python engine/render.py inclusion --medium    # Standard preview (720p, 30 fps)
+python engine/render.py inclusion --high      # Final render (1080p, 60 fps)
+python engine/render.py --help
 ```
 
 For `scenarios/inclusion.yaml`, the output is named **`inclusion.mp4`**, regardless of the Manim scene class name. Manim stores rendered files under `media/videos/` in a quality-dependent subdirectory, and the launcher opens the video after rendering.
@@ -70,6 +64,7 @@ The render command disables **Manim's animation cache** to avoid an audio-loss i
 engine/
   render.py             # CLI, scenario validation and Manim invocation
   scene.py              # Reusable YAML-driven animation engine
+  voice.py              # Voice-over audio generation.
 scenarios/
   inclusion.yaml        # Inclusion visit scenario
   ...                   # Other visits and home-based activities
@@ -78,7 +73,6 @@ assets/
   furniture/            # SVG chairs, tables and other furniture
   backgrounds/          # Background illustrations
   logo/                 # EvoluPark branding
-render.sh               # Convenience launcher using .venv
 requirements.txt        # Python dependencies
 LICENSE                 # License for original software
 ```
@@ -90,7 +84,7 @@ A scenario describes its narrative and visuals in YAML: styles, voice, character
 1. Create a new file such as `scenarios/walking.yaml`, following the structure of `scenarios/inclusion.yaml`.
 2. Reference SVG assets using paths relative to the project root.
 3. Define sequences containing narration and supported actions.
-4. Render it with `./render.sh walking --low`, then use `--high` for the final video.
+4. Render it with `python engine/render.py walking --low`, then use `--high` for the final video.
 
 For example, a character entry action can be expressed as:
 
