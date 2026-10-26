@@ -9,7 +9,7 @@ Python-based, YAML-driven animations explaining the **EvoluPark clinical study**
   <img src="assets/logo/evolupark.png" width="220">
 </p>
 
-The project uses [Manim Community](https://www.manim.community/) for animation, SVG illustrations for characters and environments, and French text-to-speech narration generated with [Edge TTS](https://github.com/rany2/edge-tts) or [Piper TTS](https://github.com/OHF-voice/piper1-gpl).
+The project uses [`Manim` Community](https://www.manim.community/) for animation, SVG illustrations for characters and environments, and French text-to-speech narration generated with [Edge TTS](https://github.com/rany2/edge-tts) or [Piper TTS](https://github.com/OHF-voice/piper1-gpl).
 
 Each YAML scenario is rendered as a narrated MP4 video using a shared animation engine. The goal is to create and update educational sequences without writing scene-specific Python code.
 
@@ -18,7 +18,7 @@ Each YAML scenario is rendered as a narrated MP4 video using a shared animation 
 ### Requirements
 
 - Python 3
-- FFmpeg and the system libraries required by Manim
+- FFmpeg and the system libraries required by `Manim`
 - Python dependencies listed in `requirements.txt`
 
 On Ubuntu, install the system dependencies if they are not already present:
@@ -45,7 +45,7 @@ To render scenario `scenarios/inclusion.yaml`, for instance, pass the scenario n
 python engine/render.py inclusion
 ```
 
-This will create video **`inclusion.mp4`**. The default render quality is **medium**. It can be changed as follows:
+This will create video `inclusion.mp4`. The default render quality is *medium*. It can be changed as follows:
 
 ```bash
 python engine/render.py inclusion --low       # Fast preview (480p, 15 fps)
@@ -54,11 +54,11 @@ python engine/render.py inclusion --high      # Final render (1080p, 60 fps)
 python engine/render.py --help
 ```
 
-Manim stores rendered files under `media/videos/` in a quality-dependent subdirectory, and the launcher opens the video after rendering.
+`Manim` stores rendered files under `media/videos/` in a quality-dependent subdirectory, and the launcher opens the video after rendering.
 
 The first synthesis of a narration requires an internet connection, either to download a TTS model (with `Piper TTS`), or to run one online (with `Edge TTS`).
 
-> Note: the render command disables Manim's animation cache to avoid an audio-loss issue observed when re-rendering narrated scenes. Generated voice-over MP3 files are cached separately in `.cache/voice/` and reused when the narration text, voice and speech rate have not changed.
+> Note: the render command disables `Manim`'s animation cache to avoid an audio-loss issue observed when re-rendering narrated scenes. Generated voice-over MP3 files are cached separately in `.cache/voice/` and reused when the narration text, voice and speech rate have not changed.
 
 ## Creating a scenario
 

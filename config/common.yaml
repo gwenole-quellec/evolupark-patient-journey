@@ -66,6 +66,27 @@ characters:
       - "assets/characters/neurologist/walking6.svg"
     walk_cycle_length: 2.0
 
+  nurse:
+    native_facing: right
+    poses:
+      standing: "assets/characters/nurse/standing.svg"
+      sitting: "assets/characters/nurse/sitting.svg"
+    heights:
+      walking: 3.5
+      standing: 3.5
+      sitting: 2.8
+    anchors:
+      sitting:
+        seat: {x: 0.44, y: 0.29}
+    walking_frames:
+      - "assets/characters/nurse/walking1.svg"
+      - "assets/characters/nurse/walking2.svg"
+      - "assets/characters/nurse/walking3.svg"
+      - "assets/characters/nurse/walking4.svg"
+      - "assets/characters/nurse/walking5.svg"
+      - "assets/characters/nurse/walking6.svg"
+    walk_cycle_length: 2.0
+
 furniture:
   chair:
     file: "assets/furniture/chair.svg"
