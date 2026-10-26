@@ -37,15 +37,15 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-### Render a scenario
+### Render an existing scenario
 
-Pass the scenario name **without** its `.yaml` extension:
+To render scenario `scenarios/inclusion.yaml`, for instance, pass the scenario name (*without* its `.yaml` extension) to `engine/render.py`:
 
 ```bash
 python engine/render.py inclusion
 ```
 
-The scenario argument is **required**. The default render quality is **medium**.
+This will create video **`inclusion.mp4`**. The default render quality is **medium**. It can be changed as follows:
 
 ```bash
 python engine/render.py inclusion --low       # Fast preview (480p, 15 fps)
@@ -54,52 +54,45 @@ python engine/render.py inclusion --high      # Final render (1080p, 60 fps)
 python engine/render.py --help
 ```
 
-For `scenarios/inclusion.yaml`, the output is named **`inclusion.mp4`**, regardless of the Manim scene class name. Manim stores rendered files under `media/videos/` in a quality-dependent subdirectory, and the launcher opens the video after rendering.
+Manim stores rendered files under `media/videos/` in a quality-dependent subdirectory, and the launcher opens the video after rendering.
 
-The render command disables **Manim's animation cache** to avoid an audio-loss issue observed when re-rendering narrated scenes. Generated voice-over MP3 files are cached separately in `.cache/voice/` and reused when the narration text, voice and speech rate have not changed. The first synthesis of a narration requires an internet connection.
+The first synthesis of a narration requires an internet connection, either to download a TTS model (with `Piper TTS`), or to run one online (with `Edge TTS`).
 
-## Project structure
-
-```text
-engine/
-  render.py             # CLI, scenario validation and Manim invocation
-  scene.py              # Reusable YAML-driven animation engine
-  voice.py              # Voice-over audio generation.
-scenarios/
-  inclusion.yaml        # Inclusion visit scenario
-  ...                   # Other visits and home-based activities
-assets/
-  characters/           # SVG characters and poses
-  furniture/            # SVG chairs, tables and other furniture
-  backgrounds/          # Background illustrations
-  logo/                 # EvoluPark branding
-requirements.txt        # Python dependencies
-LICENSE                 # License for original software
-```
-
-A scenario describes its narrative and visuals in YAML: styles, voice, characters and poses, furniture instances, spatial anchors, and ordered sequences of actions. The shared `EvoluParkScene` engine currently supports character entry, pose changes, sitting on a named chair, and displaying text. New activities (walking tests, handwriting assessments, questionnaires at home, etc.) can reuse the same engine as additional action types are implemented.
+> Note: the render command disables Manim's animation cache to avoid an audio-loss issue observed when re-rendering narrated scenes. Generated voice-over MP3 files are cached separately in `.cache/voice/` and reused when the narration text, voice and speech rate have not changed.
 
 ## Creating a scenario
 
-1. Create a new file such as `scenarios/walking.yaml`, following the structure of `scenarios/inclusion.yaml`.
-2. Reference SVG assets using paths relative to the project root.
-3. Define sequences containing narration and supported actions.
-4. Render it with `python engine/render.py walking --low`, then use `--high` for the final video.
+EvoluPark separates shared configuration from scenario-specific content:
 
-For example, a character entry action can be expressed as:
+- **`config/common.yaml`** defines the visual style, logo, voice synthesis settings (local Piper or remote Edge TTS), characters, poses, walking animation frames, furniture types, and spatial anchors.
+- **`scenarios/*.yaml`** defines the title and content of each animation, including its background, furniture instances, and ordered sequences of narrated actions.
 
-```yaml
-- character: neurologist
-  pose: walking
-  facing: left
-  action: enter
-  from: right
-  to:
-    x: 2.6
-    bottom_y: -2.6
-```
+All scenarios use the same `EvoluParkScene` animation engine.
 
-To use a new SVG pose, add its path to the corresponding character definition. The YAML `native_facing` property indicates the direction of the original artwork; the engine mirrors it when needed. For seated characters, fractional seat anchors align the character with a named chair.
+### Creating a new scenario
+
+1. Create a YAML file such as `scenarios/walking.yaml`, following the structure of `scenarios/inclusion.yaml`.
+2. Define its `title` and `scene` properties. The `scene` section contains the background settings, furniture instances, and `sequences`, each with optional narration and a list of actions.
+3. Reference existing characters, furniture types, and SVG assets using their definitions in `config/common.yaml`. Asset paths are relative to the project root.
+4. Render the scenario using:
+
+   ```bash
+   python engine/render.py walking --low
+   ```
+
+   Use `--medium` (the default) for regular previews or `--high` for final rendering. The output video is named after the scenario (e.g., `walking.mp4`).
+
+### Characters and animations
+
+The engine currently supports character entry (`enter`), pose changes (`change_pose`, `stop`), sitting on named chairs (`sit_on`), and displaying text (`show_text`).
+
+Character definitions are shared across scenarios in `config/common.yaml`. To add a new static pose, register its SVG under the character's `poses` property.
+
+Walking animations use an ordered list of SVG files under `walking_frames`, with `walk_cycle_length` controlling the distance traveled per gait cycle. When a character enters with `pose: walking`, the engine automatically cycles through these frames during movement.
+
+The `native_facing` property specifies the original orientation of the artwork; the engine mirrors SVGs when necessary. Fractional spatial anchors are used to align seated characters with furniture.
+
+New activities, such as gait assessments, handwriting tests, and home questionnaires, can reuse the same engine as additional action types are implemented.
 
 ## Credits and third-party artwork
 

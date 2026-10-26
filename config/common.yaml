@@ -1,0 +1,80 @@
+# SPDX-FileCopyrightText: 2026 EvoluPark Contributors
+# SPDX-License-Identifier: MIT
+
+style:
+  wall_color: "#F2F2F2"
+  floor_color: "#E3E7EA"
+  brand_grey: "#7D8891"
+  brand_grey_light: "#B8C1C7"
+  brand_teal: "#2EA8B8"
+  brand_teal_light: "#8FD2DA"
+  font: "Liberation Sans"
+
+logo:
+  file: "assets/logo/evolupark.svg"
+  width: 1.65
+
+voice:
+  local: false
+  name: fr-FR-VivienneMultilingualNeural
+  rate: "-5%"
+#  local: true
+#  model: fr_FR-siwis-medium
+#  length_scale: 1.05
+#  speaker: 0
+
+characters:
+  patient:
+    native_facing: right
+    poses:
+      standing: "assets/characters/patient/standing.svg"
+      sitting: "assets/characters/patient/sitting.svg"
+    heights:
+      walking: 3.5
+      standing: 3.5
+      sitting: 2.8
+    anchors:
+      sitting:
+        seat: {x: 0.44, y: 0.29}
+    walking_frames:
+      - "assets/characters/patient/walking1.svg"
+      - "assets/characters/patient/walking2.svg"
+      - "assets/characters/patient/walking3.svg"
+      - "assets/characters/patient/walking4.svg"
+      - "assets/characters/patient/walking5.svg"
+      - "assets/characters/patient/walking6.svg"
+    walk_cycle_length: 2.5
+
+  neurologist:
+    native_facing: right
+    poses:
+      standing: "assets/characters/neurologist/standing.svg"
+      sitting: "assets/characters/neurologist/sitting.svg"
+    heights:
+      walking: 3.5
+      standing: 3.5
+      sitting: 2.8
+    anchors:
+      sitting:
+        seat: {x: 0.44, y: 0.29}
+    walking_frames:
+      - "assets/characters/neurologist/walking1.svg"
+      - "assets/characters/neurologist/walking2.svg"
+      - "assets/characters/neurologist/walking3.svg"
+      - "assets/characters/neurologist/walking4.svg"
+      - "assets/characters/neurologist/walking5.svg"
+      - "assets/characters/neurologist/walking6.svg"
+    walk_cycle_length: 2.0
+
+furniture:
+  chair:
+    file: "assets/furniture/chair.svg"
+    native_facing: right
+    height: 2.1
+    anchors:
+      seat: {x: 0.42, y: 0.42}
+
+  coffee_table:
+    file: "assets/furniture/coffee-table.svg"
+    height: 1.6
+

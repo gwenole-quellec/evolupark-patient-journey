@@ -42,13 +42,17 @@ if not SCENARIO_ENV:
     raise RuntimeError(
         "EVOLUPARK_SCENARIO is not set. Use 'python engine/render.py <scenario>'."
     )
+
 SCENARIO = Path(SCENARIO_ENV)
 if not SCENARIO.is_file():
     raise FileNotFoundError(f"Scenario not found: {SCENARIO}")
-with SCENARIO.open(encoding="utf-8") as stream:
-    cfg = yaml.safe_load(stream)
-if not isinstance(cfg, dict):
-    raise ValueError(f"Scenario must contain a YAML mapping: {SCENARIO}")
+
+COMMON_CONFIG = ROOT / "config" / "common.yaml"
+with COMMON_CONFIG.open(encoding="utf-8") as f:
+    common_cfg = yaml.safe_load(f) or {}
+with SCENARIO.open(encoding="utf-8") as f:
+    scenario_cfg = yaml.safe_load(f) or {}
+cfg = {**common_cfg, **scenario_cfg}
 
 
 # ==============================================================================
