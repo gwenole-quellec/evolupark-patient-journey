@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
-# Render video with voice-over narration
-# Disable Manim caching to prevent audio from disappearing
-manim -pqh --disable_caching engine/render.py ConsultationScene
+# Convenience wrapper for rendering an EvoluPark scenario with the project's venv.
+set -euo pipefail
+exec python engine/render.py "$@"
