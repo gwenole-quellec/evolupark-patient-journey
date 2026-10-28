@@ -94,14 +94,16 @@ The `native_facing` property specifies the original orientation of the artwork; 
 
 New activities, such as gait assessments, handwriting tests, and home questionnaires, can reuse the same engine as additional action types are implemented.
 
-## Credits and third-party artwork
+## Credits and artwork licensing
 
-This project incorporates and adapts illustrations from the following collections:
+This project uses two categories of illustrations:
 
-- **[Humaaans](https://www.humaaans.com/)** — created by **Pablo Stanley**. Used for characters, poses and some background elements. **License:** [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
-- **[FreeSVG](https://freesvg.org/)** — community-contributed SVG illustrations, including furniture and other scene objects. **License:** [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). See [FreeSVG's terms](https://freesvg.org/pages/terms-and-conditions).
+- **[Humaaans](https://www.humaaans.com/)** — created by **Pablo Stanley**. Used for characters, poses, and some background elements, with adaptations made in Figma. **License:** [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
+- **Original EvoluPark illustrations** — medical equipment, recording devices, furniture, and other scene objects created specifically for the project using AI-assisted image drafting, vectorization, and manual editing. **License:** [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/), to the extent that the project is entitled to release any applicable rights.
 
-Thanks to these creators and contributors for making their artwork available for reuse and adaptation. Attribution is not required under CC0, but is provided here in recognition of their work.
+The original EvoluPark software is distributed under the MIT License. The EvoluPark name and logo are excluded from the CC0 dedication.
+
+For further details on artwork sources, adaptations, and licensing, see [assets/CREDITS.md](assets/CREDITS.md).
 
 ## License
 
