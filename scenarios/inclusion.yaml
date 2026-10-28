@@ -4,30 +4,30 @@
 title: "La visite d'inclusion"
 
 scene:
-  floor_y: -2.6
+  floor_y: -1.5
 
   background_decor:
     file: "assets/backgrounds/inclusion.svg"
     width: 2.0
     x: -5.0
-    y: -1.78
+    y: -0.7
     opacity: 1.0
 
   furniture:
     - id: patient_chair
       type: chair
       facing: right
-      x: -2.0
+      x: -2.4
       bottom_y: -2.6
 
     - id: neurologist_chair
       type: chair
       facing: left
-      x: 2.0
+      x: 2.4
       bottom_y: -2.6
 
     - id: center_table
-      type: coffee_table
+      type: examination_table
       x: 0.0
       bottom_y: -2.6
 
@@ -43,7 +43,7 @@ sequences:
         facing: right
         from: left
         to:
-          x: -2.1
+          x: -2.5
           bottom_y: -2.6
       - action: stop
         character: patient
@@ -60,7 +60,7 @@ sequences:
         facing: left
         from: right
         to:
-          x: 2.1
+          x: 2.5
           bottom_y: -2.6
       - action: stop
         character: neurologist

@@ -91,11 +91,11 @@ furniture:
   chair:
     file: "assets/furniture/chair.svg"
     native_facing: right
-    height: 2.1
+    height: 1.7
     anchors:
       seat: {x: 0.42, y: 0.42}
 
-  coffee_table:
-    file: "assets/furniture/coffee-table.svg"
-    height: 1.6
+  examination_table:
+    file: "assets/furniture/examination-table.svg"
+    height: 1.5
 
