@@ -29,7 +29,7 @@ Credit is voluntarily provided to acknowledge the original creator.
 
 ## 2. Original EvoluPark Illustrations
 
-**Creator:** Gwenolé Quellec (with AI assistance)
+**Creator:** Gwenolé Quellec
 **License:** Creative Commons CC0 1.0 Universal
 **License URL:** https://creativecommons.org/publicdomain/zero/1.0/
 
@@ -41,18 +41,16 @@ These assets were produced through a combination of AI-assisted image drafting, 
 
 ### Licensing
 
-To the extent that copyright or related rights subsist in these original illustrations, and subject to the rights held by the relevant contributors or institutions, they are made available under CC0 1.0 Universal.
+This artwork is also released under CC0 1.0 Universal.
 
-They may be reused, modified, and redistributed, including for commercial purposes, without requiring attribution.
-
-AI-assisted generation does not necessarily confer exclusive copyright protection on the resulting images. The CC0 designation expresses the project's intention to make any rights it is entitled to release available for unrestricted reuse.
+AI-assisted image drafting does not necessarily confer exclusive copyright protection on the resulting images. The CC0 designation expresses the project's intention to make any rights it is entitled to release available for unrestricted reuse.
 
 ## 3. License Compatibility
 
-The original EvoluPark animation software is distributed under the MIT License.
+The software is distributed under the MIT License.
 
-Humaaans illustrations retain their original CC0 1.0 status. Original EvoluPark illustrations are also made available under CC0 1.0, subject to the rights described above.
+Humaaans illustrations retain their original CC0 1.0 status. Original EvoluPark illustrations are also made available under CC0 1.0.
 
-The MIT License governing the EvoluPark software does not replace or supersede the licenses of visual assets.
+The MIT License governing the software does not replace or supersede the licenses of visual assets.
 
 The EvoluPark name and logo are not automatically covered by the CC0 dedication applicable to illustrations.

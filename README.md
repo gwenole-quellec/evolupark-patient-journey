@@ -99,9 +99,7 @@ New activities, such as gait assessments, handwriting tests, and home questionna
 This project uses two categories of illustrations:
 
 - **[Humaaans](https://www.humaaans.com/)** — created by **Pablo Stanley**. Used for characters, poses, and some background elements, with adaptations made in Figma. **License:** [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
-- **Original EvoluPark illustrations** — medical equipment, recording devices, furniture, and other scene objects created specifically for the project using AI-assisted image drafting, vectorization, and manual editing. **License:** [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/), to the extent that the project is entitled to release any applicable rights.
-
-The original EvoluPark software is distributed under the MIT License. The EvoluPark name and logo are excluded from the CC0 dedication.
+- **Original EvoluPark illustrations** — medical equipment, recording devices, furniture, and other scene objects created specifically for the project using AI-assisted image drafting, vectorization, and manual editing. **License:** [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
 
 For further details on artwork sources, adaptations, and licensing, see [assets/CREDITS.md](assets/CREDITS.md).
 
