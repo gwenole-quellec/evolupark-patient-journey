@@ -1,0 +1,59 @@
+# SPDX-FileCopyrightText: 2026 Gwenolé Quellec
+# SPDX-License-Identifier: MIT
+
+# Examination room: consultation table/chairs and ophthalmic equipment.
+wall_color: "#EDF4F5"
+floor_color: "#E3E7EA"
+floor_y: -1.5
+
+objects:
+  - id: harbor_picture
+    file: assets/furniture/frame.svg
+    x: 1.85
+    y: 0.8
+    width: 3.1
+    z_index: -15
+
+  - id: ophthalmic_device
+    file: assets/devices/ophthalmic-imaging-device.svg
+    x: -3.0
+    bottom_y: -2.0
+    height: 2.65
+    z_index: -5
+    facing: right
+
+  - id: ophthalmic_stool
+    file: assets/devices/ophthalmic-stool.svg
+    x: -5.2
+    bottom_y: -2.0
+    height: 1.05
+    z_index: -4
+
+  - id: patient_chair
+    type: chair
+    file: assets/furniture/chair.svg
+    x: -1.
+    bottom_y: -3.1
+    height: 1.85
+    facing: right
+    z_index: 1
+    anchors:
+      seat: {x: 0.42, y: 0.42}
+
+  - id: neurologist_chair
+    type: chair
+    file: assets/furniture/chair.svg
+    x: 4.9
+    bottom_y: -3.1
+    height: 1.85
+    facing: left
+    z_index: 1
+    anchors:
+      seat: {x: 0.42, y: 0.42}
+
+  - id: examination_table
+    file: assets/furniture/examination-table.svg
+    x: 1.85
+    bottom_y: -3.1
+    width: 4.0
+    z_index: 4

@@ -4,83 +4,60 @@
 title: "La visite d'inclusion"
 
 scene:
-  floor_y: -1.5
+  room: rooms/consultation.yaml
 
-  background_decor:
-    file: "assets/backgrounds/inclusion.svg"
-    width: 2.0
-    x: -5.0
-    y: -0.7
-    opacity: 1.0
+  sequences:
+    - id: arrival
+      narration: >
+        Bienvenue dans l'étude EvoluPark.
+        Nous allons vous expliquer comment se déroule votre participation à cette recherche.
+      actions:
+        - action: enter
+          character: patient
+          pose: walking
+          facing: right
+          from: left
+          to:
+            x: -1.
+            bottom_y: -3.1
+        - action: stop
+          character: patient
+          pose: standing
+          facing: right
 
-  furniture:
-    - id: patient_chair
-      type: chair
-      facing: right
-      x: -2.4
-      bottom_y: -2.6
+    - id: seating
+      narration: >
+        Lors de votre visite d'inclusion, vous rencontrez une neurologue
+        au Centre Hospitalier Universitaire de Brest.
+      actions:
+        - action: enter
+          character: neurologist
+          pose: walking
+          facing: left
+          from: right
+          to:
+            x: 4.9
+            bottom_y: -3.1
+        - action: stop
+          character: neurologist
+          pose: standing
+          facing: left
+        - action: sit_on
+          character: patient
+          chair: patient_chair
+          pose: sitting
+        - action: sit_on
+          character: neurologist
+          chair: neurologist_chair
+          pose: sitting
+          facing: left
 
-    - id: neurologist_chair
-      type: chair
-      facing: left
-      x: 2.4
-      bottom_y: -2.6
-
-    - id: center_table
-      type: examination_table
-      x: 0.0
-      bottom_y: -2.6
-
-sequences:
-  - id: arrival
-    narration: >
-      Bienvenue dans l'étude EvoluPark.
-      Nous allons vous expliquer comment se déroule votre participation à cette recherche.
-    actions:
-      - action: enter
-        character: patient
-        pose: walking
-        facing: right
-        from: left
-        to:
-          x: -2.5
-          bottom_y: -2.6
-      - action: stop
-        character: patient
-        pose: standing
-        facing: right
-
-  - id: seating
-    narration: >
-      Lors de votre visite d'inclusion, vous rencontrez une neurologue au Centre Hospitalier Universitaire de Brest.
-    actions:
-      - action: enter
-        character: neurologist
-        pose: walking
-        facing: left
-        from: right
-        to:
-          x: 2.5
-          bottom_y: -2.6
-      - action: stop
-        character: neurologist
-        pose: standing
-        facing: left
-      - action: sit_on
-        character: patient
-        chair: patient_chair
-        pose: sitting
-      - action: sit_on
-        character: neurologist
-        chair: neurologist_chair
-        pose: sitting
-        facing: left
-
-  - id: consultation
-    narration: >
-      La neurologue vous présente les objectifs de l'étude, son déroulement et répond à toutes vos questions.
-      Vous disposez du temps nécessaire pour réfléchir avant de décider de participer.
-    actions:
-      - action: show_text
-        text: "La neurologue vous présente l'étude."
-
+    - id: consultation
+      narration: >
+        La neurologue vous présente les objectifs de l'étude,
+        son déroulement et répond à toutes vos questions.
+        Vous disposez du temps nécessaire pour réfléchir avant
+        de décider de participer.
+      actions:
+        - action: show_text
+          text: "La neurologue vous présente l'étude."

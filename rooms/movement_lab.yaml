@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2026 Gwenolé Quellec
+# SPDX-License-Identifier: MIT
+
+# Movement lab: two equipment tripods and a chair for the walking route.
+wall_color: "#EEF2E8"
+floor_color: "#E3E7EA"
+floor_y: -1.5
+
+objects:
+  - id: left_tripod_lamp
+    file: assets/devices/camera-large-tripod.svg
+    x: -5.35
+    bottom_y: -2.0
+    height: 3.3
+    z_index: -2
+    facing: right
+
+  - id: right_tripod_lamp
+    file: assets/devices/camera-large-tripod.svg
+    x: 5.35
+    bottom_y: -2.0
+    height: 3.3
+    z_index: -2
+    facing: left
+
+  - id: walking_course_chair
+    type: chair
+    file: assets/furniture/chair.svg
+    x: -3.0
+    bottom_y: -2.6
+    height: 1.8
+    facing: right
+    z_index: 0

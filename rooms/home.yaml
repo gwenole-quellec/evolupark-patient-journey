@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: 2026 Gwenolé Quellec
+# SPDX-License-Identifier: MIT
+
+# Home office: animated cat, window and foreground desk.
+wall_color: "#F4E8E5"
+floor_color: "#E8DED2"
+floor_y: -1.5
+
+objects:
+  - id: window
+    x: 0.
+    y: 1.6
+    height: 2.8
+    z_index: -15
+    animation:
+      frames:
+        - assets/furniture/home-window1.svg
+        - assets/furniture/home-window2.svg
+        - assets/furniture/home-window3.svg
+        - assets/furniture/home-window4.svg
+        - assets/furniture/home-window5.svg
+      period: 12.0
+
+  - id: chest_of_drawers
+    file: assets/furniture/chest-of-drawers.svg
+    x: -4.6
+    bottom_y: -2.0
+    height: 1.6
+    z_index: 0
+
+  # Adjust bottom_y after measuring the actual top of the dresser SVG.
+  - id: cat
+    x: -4.6
+    bottom_y: -0.45
+    height: 1.05
+    z_index: 2
+    animation:
+      frames:
+        - assets/furniture/evolucat1.svg
+        - assets/furniture/evolucat2.svg
+      period: 1.8
+
+  - id: floor_lamp
+    file: assets/furniture/floor-lamp.svg
+    x: 4.0
+    bottom_y: -2.0
+    height: 3.2
+    z_index: 0
+
+  - id: desk
+    file: assets/furniture/desktop.svg
+    x: 0
+    bottom_y: -4.2
+    width: 7.0
+    z_index: 5
