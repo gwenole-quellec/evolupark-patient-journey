@@ -34,7 +34,7 @@ from manim import (
 )
 
 from engine.room import Room
-from engine.utils import ROOT, anchor_point, load_svg, place_bottom
+from engine.utils import ROOT, anchor_point, load_svg, place_bottom, place_object
 from engine.voice import generate_voice
 
 
@@ -109,6 +109,7 @@ class EvoluParkScene(Scene):
             )
 
         self.people = {}
+        self.illustrations = {}
         self.room = Room.from_yaml(room_path, shared=cfg)
         self.room_objects = self.room.build(self)
         self.furniture_on_stage = {
@@ -337,6 +338,43 @@ class EvoluParkScene(Scene):
             "flipped": flipped,
         }
 
+    def show_illustration(self, action):
+        """Instantly replace a foreground SVG without moving or fading it.
+
+        Subsequent actions targeting the same id inherit the first action's
+        geometry (x, y / bottom_y, width / height and z_index). Only the SVG
+        file needs to change between steps of a narrated scenario.
+        """
+        name = action.get("id", "main")
+        previous = self.illustrations.get(name)
+        previous_spec = previous["spec"] if previous else {}
+        spec = {**previous_spec, **{k: v for k, v in action.items() if k != "action"}}
+        if not spec.get("file"):
+            raise ValueError(f"Illustration {name!r} needs a file")
+
+        height = spec.get("height")
+        width = spec.get("width")
+        if (height is None) == (width is None):
+            raise ValueError(f"Illustration {name!r} needs exactly one of height/width")
+        if "y" in spec and "bottom_y" in spec:
+            raise ValueError(f"Illustration {name!r}: specify y or bottom_y, not both")
+
+        image, _ = load_svg(spec["file"], height=height, width=width)
+        place_object(image, spec)
+        image.set_z_index(int(spec.get("z_index", 8)))
+        image.set_opacity(float(spec.get("opacity", 1.0)))
+        if previous:
+            self.remove(previous["mobject"])
+        self.add(image)
+        self.illustrations[name] = {"mobject": image, "spec": spec}
+
+    def hide_illustration(self, action):
+        """Remove a named illustration immediately."""
+        name = action["id"]
+        previous = self.illustrations.pop(name, None)
+        if previous is not None:
+            self.remove(previous["mobject"])
+
     def show_text(self, action, run_time):
         """Write a short explanatory caption near the bottom of the frame."""
         message = Text(
@@ -355,7 +393,11 @@ class EvoluParkScene(Scene):
     def execute_action(self, action, run_time=0):
         """Dispatch a scenario action to its character or caption operation."""
         kind = action["action"]
-        if kind == "enter":
+        if kind == "show_illustration":
+            self.show_illustration(action)
+        elif kind == "hide_illustration":
+            self.hide_illustration(action)
+        elif kind == "enter":
             self.enter(action, run_time)
         elif kind in {"stop", "change_pose"}:
             self.change_pose(action)

@@ -1,0 +1,58 @@
+# SPDX-FileCopyrightText: 2026 EvoluPark Contributors
+# SPDX-License-Identifier: MIT
+
+title: "Le premier contact"
+
+scene:
+  room: rooms/home.yaml
+
+  sequences:
+    - id: information
+      narration: >
+        Vous avez été informé de l'étude EvoluPark
+        et souhaitez en savoir davantage.
+        Depuis votre domicile, vous envisagez
+        de participer à cette recherche.
+      actions:
+        - action: show_illustration
+          id: laptop
+          file: assets/devices/logo-on-laptop.svg
+          x: -1.0
+          y: -2.5
+          width: 5.4
+          z_index: 8
+
+        - action: show_illustration
+          id: hand
+          file: assets/devices/mouse-in-hand.svg
+          x: 2.3
+          y: -3.4
+          width: 1.5
+          z_index: 9
+
+    - id: call
+      narration: >
+        Vous contactez l'équipe de recherche
+        par téléphone.
+        Un attaché ou une attachée de recherche clinique
+        répond à votre appel.
+      actions:
+        - action: show_illustration
+          id: hand
+          file: assets/devices/phone-in-hand.svg
+          x: 2.3
+          y: -2.7
+          width: 1.5
+          z_index: 9
+
+    - id: appointment
+      narration: >
+        Cette personne vous pose quelques questions
+        afin de vérifier les premiers critères
+        permettant d'envisager votre participation.
+        Si ce premier échange est favorable,
+        elle vous propose un rendez-vous d'inclusion
+        au Centre hospitalier universitaire de Brest.
+      actions:
+        - action: hide_illustration
+          id: hand
