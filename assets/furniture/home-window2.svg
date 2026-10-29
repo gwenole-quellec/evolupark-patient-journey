@@ -1,21 +1,21 @@
 <svg width="1254" height="1254" viewBox="0 0 1254 1254" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="home-window">
+<g id="home-window2">
 <g id="outer-frame">
 <path id="Vector" d="M1108 145H142C134.82 145 129 150.82 129 158V1032C129 1039.18 134.82 1045 142 1045H1108C1115.18 1045 1121 1039.18 1121 1032V158C1121 150.82 1115.18 145 1108 145Z" fill="#C89F7A"/>
 <path id="Vector_2" d="M176 152H1080V1030H176V152Z" fill="#765B49"/>
 <path id="Vector_3" d="M204 169H1048V1026H204V169Z" fill="#E8D9C8"/>
 </g>
 <g id="Clip path group">
-<mask id="mask0_41_1441" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="244" y="215" width="762" height="755">
+<mask id="mask0_45_1668" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="244" y="215" width="762" height="755">
 <g id="window-glass-clip">
 <path id="Vector_4" d="M1006 215H244V970H1006V215Z" fill="white"/>
 </g>
 </mask>
-<g mask="url(#mask0_41_1441)">
+<g mask="url(#mask0_45_1668)">
 <g id="landscape">
 <path id="sky" d="M1006 215H244V970H1006V215Z" fill="#C8E7F8"/>
 <g id="cloud">
-<path id="Vector_5" d="M344 443C314 443 291 426 291 401C291 375 312 362 337 363C347 331 378 309 419 310C458 309 486 331 493 363C523 363 549 379 549 402C549 426 527 443 496 443H344Z" fill="#FAF8F2"/>
+<path id="Vector_5" d="M546 443C516 443 493 426 493 401C493 375 514 362 539 363C549 331 580 309 621 310C660 309 688 331 695 363C725 363 751 379 751 402C751 426 729 443 698 443H546Z" fill="#FAF8F2"/>
 </g>
 <g id="hills">
 <path id="Vector_6" d="M244 839C299 832 329 851 363 871C436 861 500 876 577 891C677 866 755 866 826 879C892 867 952 877 1006 863V970H244V839Z" fill="#B2C68F"/>
