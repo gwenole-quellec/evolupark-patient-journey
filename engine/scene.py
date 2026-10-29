@@ -34,7 +34,14 @@ from manim import (
 )
 
 from engine.room import Room
-from engine.utils import ROOT, anchor_point, load_svg, place_bottom, place_object
+from engine.utils import (
+    ROOT,
+    anchor_point,
+    load_svg,
+    make_looping_svg,
+    place_bottom,
+    place_object,
+)
 from engine.voice import generate_voice
 
 
@@ -339,34 +346,62 @@ class EvoluParkScene(Scene):
         }
 
     def show_illustration(self, action):
-        """Instantly replace a foreground SVG without moving or fading it.
+        """Show or replace a static or looping scenario illustration."""
+        name = action["id"]
+        animated = "animation" in action
 
-        Subsequent actions targeting the same id inherit the first action's
-        geometry (x, y / bottom_y, width / height and z_index). Only the SVG
-        file needs to change between steps of a narrated scenario.
-        """
-        name = action.get("id", "main")
-        previous = self.illustrations.get(name)
-        previous_spec = previous["spec"] if previous else {}
-        spec = {**previous_spec, **{k: v for k, v in action.items() if k != "action"}}
-        if not spec.get("file"):
-            raise ValueError(f"Illustration {name!r} needs a file")
+        if animated == ("file" in action):
+            raise ValueError(
+                f"{name!r}: specify either file or animation"
+            )
 
-        height = spec.get("height")
-        width = spec.get("width")
-        if (height is None) == (width is None):
-            raise ValueError(f"Illustration {name!r} needs exactly one of height/width")
-        if "y" in spec and "bottom_y" in spec:
-            raise ValueError(f"Illustration {name!r}: specify y or bottom_y, not both")
+        width = action.get("width")
+        height = action.get("height")
+        if (width is None) == (height is None):
+            raise ValueError(
+                f"{name!r}: specify exactly one of width or height"
+            )
 
-        image, _ = load_svg(spec["file"], height=height, width=width)
-        place_object(image, spec)
-        image.set_z_index(int(spec.get("z_index", 8)))
-        image.set_opacity(float(spec.get("opacity", 1.0)))
-        if previous:
+        paths = (
+            action["animation"]["frames"]
+            if animated else [action["file"]]
+        )
+
+        z_index = int(action.get("z_index", 8))
+        frames = []
+
+        native_facing = action.get("native_facing", "right")
+        facing = action.get("facing", native_facing)
+
+        for path in paths:
+            frame, _ = load_svg(
+                path,
+                height=height,
+                width=width,
+                native_facing=native_facing,
+                facing=facing,
+            )
+            place_object(frame, action)
+            frame.set_z_index(z_index)
+            frames.append(frame)
+
+        if animated:
+            animation = action["animation"]
+            obj = make_looping_svg(
+                frames,
+                period=animation.get("period", 2.0),
+                initial_phase=animation.get("phase", 0.0),
+                z_index=z_index,
+            )
+        else:
+            obj = frames[0]
+
+        previous = self.illustrations.pop(name, None)
+        if previous is not None:
             self.remove(previous["mobject"])
-        self.add(image)
-        self.illustrations[name] = {"mobject": image, "spec": spec}
+
+        self.add(obj)
+        self.illustrations[name] = {"mobject": obj}
 
     def hide_illustration(self, action):
         """Remove a named illustration immediately."""

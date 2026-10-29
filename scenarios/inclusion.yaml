@@ -9,8 +9,7 @@ scene:
   sequences:
     - id: arrival
       narration: >
-        Bienvenue dans l'étude EvoluPark.
-        Nous allons vous expliquer comment se déroule votre participation à cette recherche.
+        Après votre premier échange téléphonique avec l'attaché de recherche clinique, vous vous rendez au CHU de Brest, à la date et à l'heure convenues, pour votre visite d'inclusion.
       actions:
         - action: enter
           character: patient
@@ -27,8 +26,7 @@ scene:
 
     - id: seating
       narration: >
-        Lors de votre visite d'inclusion, vous rencontrez une neurologue
-        au Centre Hospitalier Universitaire de Brest.
+        Vous rencontrerez alors une neurologue du CHU de Brest.
       actions:
         - action: enter
           character: neurologist
@@ -36,7 +34,7 @@ scene:
           facing: left
           from: right
           to:
-            x: 4.9
+            x: 4.8
             bottom_y: -3.1
         - action: stop
           character: neurologist
@@ -54,10 +52,33 @@ scene:
 
     - id: consultation
       narration: >
-        La neurologue vous présente les objectifs de l'étude,
-        son déroulement et répond à toutes vos questions.
-        Vous disposez du temps nécessaire pour réfléchir avant
-        de décider de participer.
+        La neurologue vous présente les objectifs de l'étude, son déroulement et répond à toutes vos questions.
+        Vous disposez de temps supplémentaire pour réfléchir avant de décider de participer.
       actions:
+        - action: show_illustration
+          id: patient_mug
+          x: 0.55
+          y: -1.25
+          width: 0.42
+          z_index: 6
+          facing: right
+          animation:
+            frames:
+              - assets/furniture/coffee-mug1.svg
+              - assets/furniture/coffee-mug2.svg
+            period: 1.0
+        - action: show_illustration
+          id: neurologist_mug
+          x: 3.05
+          y: -1.25
+          width: 0.42
+          z_index: 6
+          facing: left
+          animation:
+            frames:
+              - assets/furniture/coffee-mug1.svg
+              - assets/furniture/coffee-mug2.svg
+            period: 1.0
+            phase: 0.5
         - action: show_text
           text: "La neurologue vous présente l'étude."

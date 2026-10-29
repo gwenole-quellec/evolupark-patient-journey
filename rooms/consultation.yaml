@@ -43,7 +43,7 @@ objects:
   - id: neurologist_chair
     type: chair
     file: assets/furniture/chair.svg
-    x: 4.9
+    x: 4.8
     bottom_y: -3.1
     height: 1.85
     facing: left
@@ -54,6 +54,6 @@ objects:
   - id: examination_table
     file: assets/furniture/examination-table.svg
     x: 1.85
-    bottom_y: -3.1
+    bottom_y: -3.3
     width: 4.0
     z_index: 4

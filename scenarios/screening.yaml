@@ -7,12 +7,11 @@ scene:
   room: rooms/home.yaml
 
   sequences:
+    # 'Parkine sonne' pour une prononciation correcte...
     - id: information
       narration: >
-        Vous avez été informé de l'étude EvoluPark
-        et souhaitez en savoir davantage.
-        Depuis votre domicile, vous envisagez
-        de participer à cette recherche.
+        Vous avez été informé de l'étude EvoluPark.
+        Vous avez reçu un diagnostic de maladie de 'Parkine sonne' et vous souhaitez participer à cette recherche.
       actions:
         - action: show_illustration
           id: laptop
@@ -32,10 +31,8 @@ scene:
 
     - id: call
       narration: >
-        Vous contactez l'équipe de recherche
-        par téléphone.
-        Un attaché ou une attachée de recherche clinique
-        répond à votre appel.
+        La première étape est de contacter l'équipe de recherche par téléphone.
+        Un attaché ou une attachée de recherche clinique répond à votre appel.
       actions:
         - action: show_illustration
           id: hand
@@ -47,12 +44,8 @@ scene:
 
     - id: appointment
       narration: >
-        Cette personne vous pose quelques questions
-        afin de vérifier les premiers critères
-        permettant d'envisager votre participation.
-        Si ce premier échange est favorable,
-        elle vous propose un rendez-vous d'inclusion
-        au Centre hospitalier universitaire de Brest.
+        Cette personne vous pose quelques questions afin de vérifier les premiers critères permettant d'envisager votre participation.
+        Si ce premier échange est favorable, elle vous propose un rendez-vous d'inclusion au Centre hospitalier universitaire de Brest.
       actions:
         - action: hide_illustration
           id: hand
