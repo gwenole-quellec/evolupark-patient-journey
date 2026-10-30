@@ -1,3 +1,4 @@
+
 # SPDX-FileCopyrightText: 2026 EvoluPark Contributors
 # SPDX-License-Identifier: MIT
 
@@ -11,6 +12,9 @@ scene:
       narration: >
         Après votre premier échange téléphonique avec l'attaché de recherche clinique, vous vous rendez au CHU de Brest, à la date et à l'heure convenues, pour votre visite d'inclusion.
       actions:
+        - action: show_text
+          text: |-
+            Votre rendez-vous au CHU de Brest
 
         - action: enter
           character: patient
@@ -18,7 +22,7 @@ scene:
           facing: right
           from: left
           to:
-            x: -1.
+            x: -1.0
             bottom_y: -3.1
 
         - action: stop
@@ -28,8 +32,12 @@ scene:
 
     - id: seating
       narration: >
-        Vous rencontrerez alors une neurologue du CHU de Brest.
+        À votre arrivée, vous rencontrez une neurologue du CHU de Brest.
+        Vous vous installez pour échanger avec elle.
       actions:
+        - action: show_text
+          text: |-
+            Rencontre avec la neurologue
 
         - action: enter
           character: neurologist
@@ -58,9 +66,14 @@ scene:
 
     - id: consultation
       narration: >
-        La neurologue vous présente les objectifs de l'étude, son déroulement et répond à toutes vos questions.
-        Vous disposez de temps supplémentaire pour réfléchir avant de décider de participer.
+        La neurologue vous explique les objectifs de l'étude, son déroulement et les examens prévus.
+        Elle répond à toutes vos questions.
+        Vous disposez du temps nécessaire pour réfléchir, avant de décider librement si vous souhaitez participer.
       actions:
+        - action: show_text
+          text: |-
+            Présentation de l'étude
+            et temps de réflexion
 
         - action: show_illustration
           id: patient_mug
@@ -88,6 +101,3 @@ scene:
               - assets/furniture/coffee-mug2.svg
             period: 1.0
             phase: 0.5
-
-        - action: show_text
-          text: "La neurologue vous présente l'étude."

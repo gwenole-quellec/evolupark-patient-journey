@@ -1,3 +1,4 @@
+
 # SPDX-FileCopyrightText: 2026 EvoluPark Contributors
 # SPDX-License-Identifier: MIT
 
@@ -9,10 +10,14 @@ scene:
   sequences:
     - id: quality_of_life
       narration: >
-        Une semaine avant votre visite l'hôpital, vous remplissez à domicile un questionnaire sur votre qualité de vie.
-        Il nous permet de mieux comprendre comment vous vous sentez.
-        Ce questionnaire vous sera de nouveau demandé trois mois plus tard pour suivre l'évolution de votre quotidien.
+        Tous les trois mois, vous remplissez chez vous un questionnaire sur votre qualité de vie.
+        Il nous aide à mieux comprendre comment vous vous sentez et comment votre quotidien évolue.
+        Avant chaque visite à l'hôpital, vous le remplissez environ une semaine à l'avance.
       actions:
+        - action: show_text
+          text: |-
+            Votre qualité de vie
+            Tous les 3 mois
 
         - action: show_illustration
           id: laptop
@@ -38,15 +43,23 @@ scene:
 
     - id: social_life
       narration: >
-        Une fois tous les six mois, vous remplissez aussi un questionnaire sur votre vie sociale.
-        Ils concernent notamment le soutien que vous recevez, vos activités et vos échanges avec les autres.
-        Vous recevrez un rappel par courriel et par SMS lorsque ce sera le moment de répondre.
-      actions: []
+        Tous les six mois, vous remplissez également un questionnaire sur votre vie sociale.
+        Ils portent sur vos activités, vos relations avec les autres et le soutien dont vous bénéficiez.
+      actions:
+        - action: show_text
+          text: |-
+            Votre vie sociale
+            Tous les 6 mois
 
     - id: formats_and_reminders
       narration: >
-        Vous pouvez remplir ces questionnaires sur un ordinateur, sur un téléphone, ou choisir la version papier.
+        Vous recevrez un rappel par courriel et par SMS lorsqu'il sera temps de remplir vos questionnaires.
+        Vous pourrez y répondre en ligne, depuis un ordinateur ou un smartphone.
       actions:
+        - action: show_text
+          text: |-
+            Sur ordinateur
+            ou smartphone
 
         - action: hide_illustration
           id: hand
@@ -64,8 +77,12 @@ scene:
 
     - id: paper_specificities
       narration: >
-        Si vous choisissez le papier, rapportez vos questionnaires lors de votre prochaine visite à l'hôpital.
+        Si vous préférez, vous pouvez aussi remplir les questionnaires sur papier, à votre domicile.
+        Il vous suffira de les rapporter lors de votre prochaine visite à l'hôpital.
       actions:
+        - action: show_text
+          text: |-
+            Ou sur papier
 
         - action: hide_illustration
           id: smartphone

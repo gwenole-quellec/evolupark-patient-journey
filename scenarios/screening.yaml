@@ -1,3 +1,4 @@
+
 # SPDX-FileCopyrightText: 2026 EvoluPark Contributors
 # SPDX-License-Identifier: MIT
 
@@ -7,12 +8,16 @@ scene:
   room: rooms/home.yaml
 
   sequences:
-    # 'Parkine sonne' pour une prononciation correcte...
+    # 'Parkinesonne' pour une prononciation correcte...
     - id: information
       narration: >
-        Vous avez été informé de l'étude EvoluPark.
-        Vous avez reçu un diagnostic de maladie de 'Parkine sonne' et vous souhaitez participer à cette recherche.
+        Vous avez été informé de l'étude EvoluPark ?
+        Vous avez reçu un diagnostic de maladie de 'Parkinesonne' et souhaitez participer à cette recherche ?
       actions:
+        - action: show_text
+          text: |-
+            Vous souhaitez participer
+            à EvoluPark ?
 
         - action: show_illustration
           id: laptop
@@ -32,9 +37,13 @@ scene:
 
     - id: call
       narration: >
-        La première étape est de contacter l'équipe de recherche par téléphone.
-        Un attaché ou une attachée de recherche clinique répond à votre appel.
+        Vous contactez alors l'équipe de recherche par téléphone.
+        Un attaché ou une attachée de recherche clinique vous répond.
       actions:
+        - action: show_text
+          text: |-
+            Un premier échange
+            téléphonique
 
         - action: show_illustration
           id: hand
@@ -46,9 +55,26 @@ scene:
 
     - id: appointment
       narration: >
-        Cette personne vous pose quelques questions afin de vérifier les premiers critères permettant d'envisager votre participation.
-        Si ce premier échange est favorable, elle vous propose un rendez-vous d'inclusion au Centre hospitalier universitaire de Brest.
+        Cette personne vous pose quelques questions pour vérifier les premiers critères de participation.
+        Si ce premier échange est favorable, elle vous propose un rendez-vous d'inclusion au CHU de Brest.
       actions:
+        - action: show_text
+          text: |-
+            Vérification des critères
+            et prise de rendez-vous
 
         - action: hide_illustration
           id: hand
+
+        - action: show_illustration
+          id: speech
+          x: 3.0
+          y: -2.0
+          width: 2.0
+          z_index: 6
+          facing: right
+          animation:
+            frames:
+              - assets/speech/yes.svg
+              - assets/speech/no.svg
+            period: 5.0

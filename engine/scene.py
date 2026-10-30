@@ -20,6 +20,7 @@ from pathlib import Path
 import yaml
 from manim import (
     DOWN,
+    LEFT,
     RIGHT,
     Scene,
     SVGMobject,
@@ -28,7 +29,6 @@ from manim import (
     UP,
     UpdateFromAlphaFunc,
     UR,
-    Write,
     config,
     linear,
 )
@@ -141,6 +141,8 @@ class EvoluParkScene(Scene):
         title.to_corner(UL, buff=0.4)
         title.set_z_index(20)
         self.add(title)
+        self.title = title
+        self.current_text = None
 
         logo_cfg = cfg.get("logo", {})
         logo_path = ROOT / logo_cfg.get("file", "assets/logo/evolupark.svg")
@@ -413,20 +415,32 @@ class EvoluParkScene(Scene):
         if previous is not None:
             self.remove(previous["mobject"])
 
-    def show_text(self, action, run_time):
-        """Write a short explanatory caption near the bottom of the frame."""
+    def show_text(self, action, run_time=0):
+        """Display a caption below the title, replacing the previous one."""
+
+        # Remove previous caption.
+        if self.current_text is not None:
+            self.remove(self.current_text)
+
         message = Text(
             action["text"],
             font=cfg["style"].get("font", "Liberation Sans"),
             weight="SEMIBOLD",
-            font_size=28,
+            font_size=26,
             color=cfg["style"]["brand_grey"],
         )
-        if message.width > 11:
-            message.scale_to_fit_width(11)
-        message.to_edge(DOWN, buff=0.25)
-        message.set_z_index(10)
-        self.play(Write(message), run_time=run_time)
+
+        if message.width > 8.7:
+            message.scale_to_fit_width(8.7)
+
+        # Position below the scene title, left-aligned.
+        message.next_to(self.title, DOWN, buff=0.18)
+        message.align_to(self.title, LEFT)
+        message.set_z_index(19)
+
+        # Display immediately, without animation.
+        self.add(message)
+        self.current_text = message
 
     def execute_action(self, action, run_time=0):
         """Dispatch a scenario action to its character or caption operation."""
@@ -460,7 +474,7 @@ class EvoluParkScene(Scene):
             duration = float(sequence.get("duration", 2.0))
 
         actions = sequence.get("actions", [])
-        animated = {"enter", "show_text"}
+        animated = {"enter"}
         animated_count = sum(a["action"] in animated for a in actions)
         motion_time = duration * 0.75 if animated_count else 0.0
         step = motion_time / animated_count if animated_count else 0.0
