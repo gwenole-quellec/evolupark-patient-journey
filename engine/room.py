@@ -18,7 +18,13 @@ from pathlib import Path
 import yaml
 from manim import Line, Rectangle, config
 
-from engine.utils import ROOT, load_svg, make_looping_svg, place_object
+from engine.utils import (
+  add_motion,
+  load_svg,
+  make_looping_svg,
+  place_object,
+  ROOT,
+)
 
 
 class Room:
@@ -159,6 +165,7 @@ class Room:
         else:
             obj = frames[0]
 
+        add_motion(obj, spec.get("motion"))
         scene.add(obj)
         self.objects[name] = {
             "mobject": obj,

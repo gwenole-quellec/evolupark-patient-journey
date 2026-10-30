@@ -10,10 +10,11 @@ bottom-left origin. Continuous SVG animation is driven by Manim updaters,
 not by blocking ``Scene.play`` calls.
 """
 
+from math import cos, pi, sin
 from pathlib import Path
 
 import numpy as np
-from manim import SVGMobject, UP
+from manim import RIGHT, SVGMobject, UP
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -83,6 +84,51 @@ def anchor_point(obj, anchor, flipped=False):
         obj.get_bottom()[1] + y * obj.height,
         0.0,
     ])
+
+
+def add_motion(obj, motion):
+    """Attach a configurable looping motion to any Manim mobject."""
+    if not motion:
+        return obj
+
+    kind = motion.get("type", "ping_pong")
+    if kind not in {"ping_pong", "sine"}:
+        raise ValueError(f"Unknown motion type: {kind}")
+
+    dx = float(motion.get("dx", 0.0))
+    dy = float(motion.get("dy", 0.0))
+    period = float(motion.get("period", 4.0))
+    active_fraction = float(motion.get("active_fraction", 0.5))
+    phase = float(motion.get("phase", 0.0))
+
+    if period <= 0:
+        raise ValueError("Motion period must be positive")
+    if not 0 < active_fraction <= 1:
+        raise ValueError("active_fraction must be in (0, 1]")
+
+    origin = obj.get_center().copy()
+    displacement = dx * RIGHT + dy * UP
+    elapsed = 0.0
+
+    def update(mob, dt):
+        nonlocal elapsed
+        elapsed = (elapsed + max(0.0, float(dt))) % period
+        t = (elapsed / period + phase) % 1.0
+
+        if kind == "ping_pong":
+            # Move out and back, then remain stationary.
+            if t < active_fraction:
+                alpha = sin(pi * t / active_fraction) ** 2
+            else:
+                alpha = 0.0
+        else:
+            # Continuous smooth back-and-forth movement.
+            alpha = (1 - cos(2 * pi * t)) / 2
+
+        mob.move_to(origin + alpha * displacement)
+
+    obj.add_updater(update)
+    return obj
 
 
 def make_looping_svg(frames, *, period, initial_phase=0.0, z_index=0):

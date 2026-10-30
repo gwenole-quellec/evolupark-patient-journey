@@ -3,7 +3,7 @@
 
 # Examination room: consultation table/chairs and ophthalmic equipment.
 wall_color: "#EDF4F5"
-floor_color: "#E3E7EA"
+floor_color: "#E8DED2"
 floor_y: -1.5
 
 objects:
@@ -43,7 +43,7 @@ objects:
   - id: neurologist_chair
     type: chair
     file: assets/furniture/chair.svg
-    x: 4.8
+    x: 4.75
     bottom_y: -3.1
     height: 1.85
     facing: left

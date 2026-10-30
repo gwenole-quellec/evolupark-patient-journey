@@ -36,6 +36,7 @@ from manim import (
 from engine.room import Room
 from engine.utils import (
     ROOT,
+    add_motion,
     anchor_point,
     load_svg,
     make_looping_svg,
@@ -399,6 +400,8 @@ class EvoluParkScene(Scene):
         previous = self.illustrations.pop(name, None)
         if previous is not None:
             self.remove(previous["mobject"])
+
+        add_motion(obj, action.get("motion"))
 
         self.add(obj)
         self.illustrations[name] = {"mobject": obj}

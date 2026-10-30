@@ -3,7 +3,7 @@
 
 # Home office: animated cat, window and foreground desk.
 wall_color: "#F4E8E5"
-floor_color: "#E8DED2"
+floor_color: "#E3E7EA"
 floor_y: -1.5
 
 objects:
@@ -51,5 +51,5 @@ objects:
     file: assets/furniture/desktop.svg
     x: 0
     bottom_y: -4.2
-    width: 7.0
+    width: 8.0
     z_index: 5

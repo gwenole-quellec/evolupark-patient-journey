@@ -107,4 +107,4 @@ For further details on artwork sources, adaptations, and licensing, see [assets/
 
 The **original EvoluPark Python code, scripts and YAML scenarios** in this repository are released under the **MIT License** (see [`LICENSE`](LICENSE)), subject to the applicable ownership rights.
 
-**Third-party SVG illustrations are not relicensed under MIT.** Humaaans and FreeSVG illustrations retain their CC0 status, including when recolored, rearranged or otherwise adapted for this project. Other assets, including logos or material from additional providers, may have separate rights and should be documented individually before redistribution.
+**Third-party SVG illustrations are not relicensed under MIT.** Humaaans illustrations retain their CC0 status, including when recolored, rearranged or otherwise adapted for this project.

@@ -112,12 +112,12 @@
 </g>
 <g id="patient-left-hand">
 <path id="Vector_103" d="M364 797C397 750 419 709 450 682C468 666 484.333 654.333 499 647C517 637 532 643 541 648C554 638 573 636 587 644C596 641 612 645 625 653L668 671C677.333 675.667 680 682.667 676 692C670 706 643 702 627 696C617.667 692.667 611.333 691.667 608 693C589 706 574 727 562 747C572 761 587 778 603 772L641 742C657 730 666 736 672 749C679 766 660 781 650 793C623 824 600 846 578 858C553.333 870.667 521.667 876 483 874L443 892L363 834L364 797Z" fill="#FFDBB4"/>
-<path id="Vector_104" opacity="0.12" d="M482 651C468.667 660.333 459.333 674.333 454 693" stroke-width="3" stroke-linecap="round" stroke="#FF4133"/>
-<path id="Vector_105" opacity="0.13" d="M541 646C525 655.333 511.667 669.333 501 688" stroke-width="3" stroke-linecap="round" stroke="#FF4133"/>
-<path id="Vector_106" opacity="0.12" d="M585 648C567.667 659.333 554.667 674.667 546 694" stroke-width="3" stroke-linecap="round" stroke="#FF4133"/>
+<path id="Vector_78_2" d="M470 666C456.667 675.333 447.333 689.333 442 708" stroke-width="3" stroke-linecap="round" stroke="#FFBD76"/>
+<path id="Vector_79_2" d="M538 648C522 657.333 508.667 671.333 498 690" stroke-width="3" stroke-linecap="round" stroke="#FFBD76"/>
+<path id="Vector_80_2" d="M586 646C568.667 657.333 555.667 672.667 547 692" stroke-width="3" stroke-linecap="round" stroke="#FFBD76"/>
 </g>
 <g id="patient-left-sleeve">
-<path id="Vector_107" d="M0 1024L288 811C310.667 793.667 331.667 787 351 791C398 798 441 845 459 875C469 897.667 465 920.333 447 943L387 1024H96H0Z" fill="#FF4133"/>
+<path id="Vector_104" d="M0 1024L288 811C310.667 793.667 331.667 787 351 791C398 798 441 845 459 875C469 897.667 465 920.333 447 943L387 1024H96H0Z" fill="#FF4133"/>
 </g>
 </g>
 </svg>

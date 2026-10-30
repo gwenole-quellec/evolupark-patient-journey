@@ -11,6 +11,7 @@ scene:
       narration: >
         Après votre premier échange téléphonique avec l'attaché de recherche clinique, vous vous rendez au CHU de Brest, à la date et à l'heure convenues, pour votre visite d'inclusion.
       actions:
+
         - action: enter
           character: patient
           pose: walking
@@ -19,6 +20,7 @@ scene:
           to:
             x: -1.
             bottom_y: -3.1
+
         - action: stop
           character: patient
           pose: standing
@@ -28,22 +30,26 @@ scene:
       narration: >
         Vous rencontrerez alors une neurologue du CHU de Brest.
       actions:
+
         - action: enter
           character: neurologist
           pose: walking
           facing: left
           from: right
           to:
-            x: 4.8
+            x: 4.75
             bottom_y: -3.1
+
         - action: stop
           character: neurologist
           pose: standing
           facing: left
+
         - action: sit_on
           character: patient
           chair: patient_chair
           pose: sitting
+
         - action: sit_on
           character: neurologist
           chair: neurologist_chair
@@ -55,6 +61,7 @@ scene:
         La neurologue vous présente les objectifs de l'étude, son déroulement et répond à toutes vos questions.
         Vous disposez de temps supplémentaire pour réfléchir avant de décider de participer.
       actions:
+
         - action: show_illustration
           id: patient_mug
           x: 0.55
@@ -67,6 +74,7 @@ scene:
               - assets/furniture/coffee-mug1.svg
               - assets/furniture/coffee-mug2.svg
             period: 1.0
+
         - action: show_illustration
           id: neurologist_mug
           x: 3.05
@@ -80,5 +88,6 @@ scene:
               - assets/furniture/coffee-mug2.svg
             period: 1.0
             phase: 0.5
+
         - action: show_text
           text: "La neurologue vous présente l'étude."
