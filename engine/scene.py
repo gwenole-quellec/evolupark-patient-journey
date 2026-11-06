@@ -34,13 +34,11 @@ from manim import (
 from engine.room import Room
 from engine.utils import (
     ROOT,
-    add_motion,
     anchor_point,
+    build_svg_object,
     load_character,
     load_svg,
-    make_looping_svg,
     place_bottom,
-    place_object,
 )
 from engine.voice import generate_voice
 
@@ -451,64 +449,24 @@ class EvoluParkScene(Scene):
             self.wait(remaining)
 
     def show_illustration(self, action):
-        """Show or replace a static or looping scenario illustration."""
+        """Show or replace a named scenario illustration."""
         name = action["id"]
-        animated = "animation" in action
 
-        if animated == ("file" in action):
-            raise ValueError(
-                f"{name!r}: specify either file or animation"
-            )
-
-        width = action.get("width")
-        height = action.get("height")
-        if (width is None) == (height is None):
-            raise ValueError(
-                f"{name!r}: specify exactly one of width or height"
-            )
-
-        paths = (
-            action["animation"]["frames"]
-            if animated else [action["file"]]
-        )
-
-        z_index = int(action.get("z_index", 8))
-        frames = []
-
-        native_facing = action.get("native_facing", "right")
-        facing = action.get("facing", native_facing)
-
-        for path in paths:
-            frame, _ = load_svg(
-                path,
-                height=height,
-                width=width,
-                native_facing=native_facing,
-                facing=facing,
-            )
-            place_object(frame, action)
-            frame.set_z_index(z_index)
-            frames.append(frame)
-
-        if animated:
-            animation = action["animation"]
-            obj = make_looping_svg(
-                frames,
-                period=animation.get("period", 2.0),
-                initial_phase=animation.get("phase", 0.0),
-                z_index=z_index,
-            )
-        else:
-            obj = frames[0]
+        obj, _ = build_svg_object({
+            "z_index": 8,
+            **action,
+        })
 
         previous = self.illustrations.pop(name, None)
+
         if previous is not None:
             self.remove(previous["mobject"])
 
-        add_motion(obj, action.get("motion"))
-
         self.add(obj)
-        self.illustrations[name] = {"mobject": obj}
+
+        self.illustrations[name] = {
+            "mobject": obj,
+        }
 
     def show_text(self, action):
         """Display a caption below the title, replacing the previous one."""

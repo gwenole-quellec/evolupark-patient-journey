@@ -16,13 +16,7 @@ including metadata needed to attach a seated character to a room chair.
 import yaml
 from manim import Line, Rectangle, config
 
-from engine.utils import (
-  add_motion,
-  load_svg,
-  make_looping_svg,
-  place_object,
-  ROOT,
-)
+from engine.utils import ROOT, build_svg_object
 
 
 class Room:
@@ -101,64 +95,22 @@ class Room:
         self.floor_y = floor_y
 
     def _add_object(self, scene, entry):
-        """Instantiate a static asset or an animated sequence of SVG assets."""
+        """Add a static or animated object to the room."""
         if not isinstance(entry, dict) or "id" not in entry:
             raise ValueError(f"Room object needs an 'id': {entry}")
+
         name = entry["id"]
+
         if name in self.objects:
             raise ValueError(f"Duplicate object id in room: {name}")
 
-        furniture_type = entry.get("type")
-        spec = entry
+        obj, flipped = build_svg_object(entry)
 
-        animated = "animation" in entry
-        if animated and "file" in entry:
-            raise ValueError(f"'{name}' must not define both 'file' and 'animation'")
-        if not animated and not spec.get("file"):
-            raise ValueError(f"'{name}' requires a 'file' or 'animation'")
-        if ("height" in spec) == ("width" in spec):
-            raise ValueError(f"'{name}' needs exactly one of 'height' or 'width'")
-
-        native = spec.get("native_facing", "right")
-        facing = spec.get("facing", native)
-        z_index = int(spec.get("z_index", 0))
-        paths = (
-            spec["animation"]["frames"] if animated else [spec["file"]]
-        )
-        if not paths:
-            raise ValueError(f"'{name}' animation has no SVG frames")
-
-        frames = []
-        flipped = False
-        for path in paths:
-            obj, flipped = load_svg(
-                path,
-                height=spec.get("height"),
-                width=spec.get("width"),
-                native_facing=native,
-                facing=facing,
-            )
-            place_object(obj, spec)
-            obj.set_opacity(float(spec.get("opacity", 1.0)))
-            obj.set_z_index(z_index)
-            frames.append(obj)
-
-        if animated:
-            animation = spec["animation"]
-            obj = make_looping_svg(
-                frames,
-                period=animation.get("period", 2.0),
-                initial_phase=animation.get("phase", 0),
-                z_index=z_index,
-            )
-        else:
-            obj = frames[0]
-
-        add_motion(obj, spec.get("motion"))
         scene.add(obj)
+
         self.objects[name] = {
             "mobject": obj,
-            "type": furniture_type,
+            "type": entry.get("type"),
             "flipped": flipped,
-            "anchors": spec.get("anchors", {}),
+            "anchors": entry.get("anchors", {}),
         }

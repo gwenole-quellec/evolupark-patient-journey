@@ -32,6 +32,80 @@ with COMMON_CONFIG.open(encoding="utf-8") as f:
 # Asset loading
 # ==============================================================================
 
+def build_svg_object(spec):
+    """Build a static or looping SVG object from a YAML specification.
+
+    Supports:
+        - file or animation.frames
+        - width or height
+        - x, y or bottom_y
+        - native_facing and facing
+        - opacity and z_index
+        - optional periodic motion
+
+    Returns:
+        (mobject, flipped)
+    """
+    name = spec.get("id", "<unnamed>")
+    animated = "animation" in spec
+    has_file = "file" in spec
+
+    if animated == has_file:
+        raise ValueError(
+            f"{name!r}: specify exactly one of file or animation"
+        )
+
+    width = spec.get("width")
+    height = spec.get("height")
+
+    if (width is None) == (height is None):
+        raise ValueError(
+            f"{name!r}: specify exactly one of width or height"
+        )
+
+    animation = spec["animation"] if animated else None
+    paths = animation["frames"] if animated else [spec["file"]]
+
+    if not paths:
+        raise ValueError(f"{name!r}: no SVG frames provided")
+
+    native_facing = spec.get("native_facing", "right")
+    facing = spec.get("facing", native_facing)
+    z_index = int(spec.get("z_index", 0))
+    opacity = float(spec.get("opacity", 1.0))
+
+    frames = []
+    flipped = False
+
+    for path in paths:
+        frame, flipped = load_svg(
+            path,
+            height=height,
+            width=width,
+            native_facing=native_facing,
+            facing=facing,
+        )
+
+        place_object(frame, spec)
+        frame.set_opacity(opacity)
+        frame.set_z_index(z_index)
+        frames.append(frame)
+
+    if animated:
+        obj = make_looping_svg(
+            frames,
+            period=animation.get("period", 2.0),
+            initial_phase=animation.get("phase", 0.0),
+            z_index=z_index,
+        )
+    else:
+        obj = frames[0]
+
+    add_motion(obj, spec.get("motion"))
+
+    return obj, flipped
+
+
 def load_character(name, pose, facing):
     """Load one pose of a named character at its configured height and facing.
 
