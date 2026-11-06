@@ -16,18 +16,31 @@ objects:
 
   - id: ophthalmic_device
     file: assets/devices/ophthalmic-imaging-device.svg
-    x: -3.0
-    bottom_y: -2.0
+    x: -4.0
+    bottom_y: -1.75
     height: 2.65
     z_index: -5
     facing: right
 
   - id: ophthalmic_stool
+    type: chair
     file: assets/devices/ophthalmic-stool.svg
-    x: -5.2
-    bottom_y: -2.0
+    x: -6.2
+    bottom_y: -1.75
     height: 1.05
     z_index: -4
+    anchors:
+      seat: {x: 0.50, y: 0.75}
+
+  - id: second_ophthalmic_stool
+    type: chair
+    file: assets/devices/ophthalmic-stool.svg
+    x: -2.0
+    bottom_y: -1.75
+    height: 1.05
+    z_index: -4
+    anchors:
+      seat: {x: 0.50, y: 0.75}
 
   - id: patient_chair
     type: chair

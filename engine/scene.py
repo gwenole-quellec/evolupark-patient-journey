@@ -88,84 +88,158 @@ class EvoluParkScene(Scene):
         self,
         obj,
         name,
-        facing,
-        start_x,
-        end_x,
-        bottom_y,
-        run_time,
+        facing=None,
+        start_x=None,
+        end_x=None,
+        bottom_y=None,
+        run_time=1.0,
+        waypoints=None,
     ):
-        """Walk a character horizontally using distance-synchronized SVG frames.
+        """Animate walking along a polyline, including vertical movement."""
+        from math import hypot
 
-        SVG frames are preloaded. Their order is not reversed when the figure
-        faces left; ``load_svg`` mirrors the illustrations instead. If fewer
-        than two walking frames exist, the character simply slides.
+        # Backward compatibility with horizontal walking.
+        if waypoints is None:
+            waypoints = [
+                (float(start_x), float(bottom_y)),
+                (float(end_x), float(bottom_y)),
+            ]
 
-        Args:
-            obj: On-stage character mobject to update.
-            name: Identifier in ``common.yaml:characters``.
-            facing: Requested left/right orientation.
-            start_x: Horizontal starting position.
-            end_x: Horizontal destination.
-            bottom_y: Height of the character's feet in scene coordinates.
-            run_time: Time allotted to the movement, in seconds.
-        """
+        points = [(float(x), float(y)) for x, y in waypoints]
+
+        if len(points) < 2:
+            raise ValueError("Walking requires at least two points")
+
         spec = cfg["characters"][name]
         paths = spec.get("walking_frames", [])
-
-        if len(paths) < 2:
-            self.play(
-                obj.animate.shift((end_x - start_x) * RIGHT),
-                run_time=run_time,
-                rate_func=linear,
-            )
-            return
-
-        native = spec.get("native_facing", "right")
-        if isinstance(native, dict):
-            native = native.get("walking", "right")
-        height = spec.get("heights", {}).get("walking", 3.5)
-
-        frames = [
-            load_svg(
-                path,
-                height,
-                native_facing=native,
-                facing=facing,
-            )[0]
-            for path in paths
-        ]
-
         cycle_length = float(spec.get("walk_cycle_length", 2.0))
+
         if cycle_length <= 0:
             raise ValueError("walk_cycle_length must be positive")
 
-        current_frame = -1
-        frame_count = len(frames)
-        distance = abs(end_x - start_x)
+        # Build nonzero-length segments.
+        segments = []
+        total_length = 0.0
+        previous_facing = facing or self.people[name]["facing"]
+
+        for (x0, y0), (x1, y1) in zip(points[:-1], points[1:]):
+            dx = x1 - x0
+            dy = y1 - y0
+            length = hypot(dx, dy)
+
+            if length < 1e-8:
+                continue
+
+            if facing is not None:
+                direction = facing
+            elif dx > 1e-8:
+                direction = "right"
+            elif dx < -1e-8:
+                direction = "left"
+            else:
+                direction = previous_facing
+
+            previous_facing = direction
+            total_length += length
+
+            segments.append({
+                "x0": x0,
+                "y0": y0,
+                "dx": dx,
+                "dy": dy,
+                "length": length,
+                "end_distance": total_length,
+                "facing": direction,
+            })
+
+        if not segments:
+            place_bottom(obj, *points[-1])
+            return previous_facing
+
+        # Preload walking frames for each orientation.
+        native = spec.get("native_facing", "right")
+        if isinstance(native, dict):
+            native = native.get("walking", "right")
+
+        height = spec.get("heights", {}).get("walking", 3.5)
+        frames_by_facing = {}
+
+        for direction in {s["facing"] for s in segments}:
+            if len(paths) >= 2:
+                frames_by_facing[direction] = [
+                    load_svg(
+                        path,
+                        height,
+                        native_facing=native,
+                        facing=direction,
+                    )[0]
+                    for path in paths
+                ]
+            else:
+                frames_by_facing[direction] = [
+                    load_character(name, "standing", direction)[0]
+                ]
+
+        current_key = None
 
         def update(mob, alpha):
-            """Advance the gait frame as distance accumulates."""
-            nonlocal current_frame
+            nonlocal current_key
 
-            x = start_x + alpha * (end_x - start_x)
-            traveled = alpha * distance
-            phase = (traveled / cycle_length) % 1.0
-            frame_index = min(int(phase * frame_count), frame_count - 1)
+            distance = alpha * total_length
 
-            if frame_index != current_frame:
+            # Find current segment.
+            index = 0
+            while (
+                index < len(segments) - 1
+                and distance > segments[index]["end_distance"]
+            ):
+                index += 1
+
+            segment = segments[index]
+
+            start_distance = (
+                segments[index - 1]["end_distance"]
+                if index > 0 else 0.0
+            )
+
+            progress = (
+                (distance - start_distance) / segment["length"]
+            )
+            progress = max(0.0, min(1.0, progress))
+
+            x = segment["x0"] + progress * segment["dx"]
+            y = segment["y0"] + progress * segment["dy"]
+
+            # Synchronize gait with distance traveled.
+            frames = frames_by_facing[segment["facing"]]
+            phase = (distance / cycle_length) % 1.0
+            frame_index = min(
+                int(phase * len(frames)),
+                len(frames) - 1,
+            )
+
+            key = (segment["facing"], frame_index)
+
+            if key != current_key:
                 mob.become(frames[frame_index])
                 mob.set_z_index(2)
-                current_frame = frame_index
-            place_bottom(mob, x, bottom_y)
+                current_key = key
 
-        self.play(
-            UpdateFromAlphaFunc(
-                obj,
-                update,
-                run_time=run_time,
-                rate_func=linear,
+            place_bottom(mob, x, y)
+
+        if run_time > 0:
+            self.play(
+                UpdateFromAlphaFunc(
+                    obj,
+                    update,
+                    run_time=run_time,
+                    rate_func=linear,
+                )
             )
-        )
+        else:
+            update(obj, 1.0)
+
+        return segments[-1]["facing"]
 
     def change_pose(self, action):
         """Instantly replace a character's pose without shifting its feet."""
@@ -491,40 +565,58 @@ class EvoluParkScene(Scene):
         )
 
     def walk_to(self, action, run_time):
-        """Walk an existing character horizontally to a destination."""
+        """Walk along optional waypoints or directly to a destination."""
         name = action["character"]
 
+        if "path" in action:
+            targets = action["path"]
+        else:
+            targets = [action.get("to")]
+
+        if not isinstance(targets, list) or not targets:
+            raise ValueError(
+                f"{name}: walk_to requires a nonempty path"
+            )
+
+        for target in targets:
+            if not isinstance(target, dict) or "x" not in target:
+                raise ValueError(
+                    f"{name}: every waypoint requires an x coordinate"
+                )
+
+        # Create character outside the frame if necessary.
         if name not in self.people:
             side = action.get("from")
             if side not in {"left", "right"}:
                 raise ValueError(
-                    f"Character {name!r} is not on stage. "
-                    "Specify 'from: left' or 'from: right'."
+                    f"{name} is not on stage: specify from: left/right"
                 )
 
-            facing = action.get(
-                "facing", "right" if side == "left" else "left"
+            initial_facing = action.get(
+                "facing",
+                "right" if side == "left" else "left",
             )
 
-            obj, flipped = load_character(name, "walking", facing)
+            obj, flipped = load_character(
+                name, "walking", initial_facing
+            )
 
             sign = -1 if side == "left" else 1
             start_x = sign * (
                 config.frame_width / 2 + obj.width / 2 + 0.2
             )
-
-            bottom_y = float(
-                action["to"].get("bottom_y", self.room.floor_y)
+            start_y = float(
+                targets[0].get("bottom_y", self.room.floor_y)
             )
 
-            place_bottom(obj, start_x, bottom_y)
+            place_bottom(obj, start_x, start_y)
             obj.set_z_index(2)
             self.add(obj)
 
             self.people[name] = {
                 "mobject": obj,
                 "pose": "walking",
-                "facing": facing,
+                "facing": initial_facing,
                 "flipped": flipped,
             }
 
@@ -532,43 +624,55 @@ class EvoluParkScene(Scene):
         obj = previous["mobject"]
 
         start_x = float(obj.get_center()[0])
-        end_x = float(action["to"]["x"])
+        start_y = float(obj.get_bottom()[1])
 
-        bottom_y = float(
-            action["to"].get("bottom_y", obj.get_bottom()[1])
-        )
+        # Current position is the first waypoint.
+        waypoints = [(start_x, start_y)]
 
-        facing = action.get(
-            "facing",
-            "right" if end_x >= start_x else "left",
-        )
+        for target in targets:
+            last_y = waypoints[-1][1]
+            waypoints.append((
+                float(target["x"]),
+                float(target.get("bottom_y", last_y)),
+            ))
 
-        # Switch to the first walking frame.
+        # Determine initial walking direction.
+        facing = action.get("facing")
+
+        if facing is None:
+            initial_facing = previous["facing"]
+
+            for (x0, _), (x1, _) in zip(
+                waypoints[:-1], waypoints[1:]
+            ):
+                if abs(x1 - x0) > 1e-8:
+                    initial_facing = (
+                        "right" if x1 > x0 else "left"
+                    )
+                    break
+        else:
+            initial_facing = facing
+
         self.change_pose({
             "character": name,
             "pose": "walking",
-            "facing": facing,
+            "facing": initial_facing,
         })
 
         obj = self.people[name]["mobject"]
-        place_bottom(obj, start_x, bottom_y)
+        place_bottom(obj, start_x, start_y)
 
-        if run_time > 0 and abs(end_x - start_x) > 1e-6:
-            self.animate_walk(
-                obj=obj,
-                name=name,
-                facing=facing,
-                start_x=start_x,
-                end_x=end_x,
-                bottom_y=bottom_y,
-                run_time=run_time,
-            )
-        else:
-            place_bottom(obj, end_x, bottom_y)
+        final_facing = self.animate_walk(
+            obj=obj,
+            name=name,
+            facing=facing,
+            waypoints=waypoints,
+            run_time=run_time,
+        )
 
-        # Finish standing rather than frozen mid-stride.
+        # Finish standing at the final position.
         self.change_pose({
             "character": name,
             "pose": action.get("end_pose", "standing"),
-            "facing": facing,
+            "facing": final_facing,
         })
