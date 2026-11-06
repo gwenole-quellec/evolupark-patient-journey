@@ -104,12 +104,12 @@ scene:
     - id: biological_samples
       narration: >
         Puis nous recueillons des échantillons biologiques pour rechercher des marqueurs de la maladie.
-        Pour cela, nous prélevons du sang, de l'urine, de la salive et des larmes.
+        Pour cela, nous prélevons de la salive, des larmes, du sang et de l'urine.
       actions:
         - action: show_text
           text: |-
-            Prélèvement de sang, d'urine,
-            de larme et de salive
+            Prélèvement de salive, de larmes,
+            de sang, et d'urine
 
         - action: show_illustration
           id: test
@@ -119,37 +119,34 @@ scene:
           width: 0.65
           z_index: 8
 
-    - id: octa
+    - id: octa1
       narration: >
         Nous réalisons aussi un examen oculaire non invasif, appelé OCT angiographie.
-        Cet examen permet d'observer la structure et les petits vaisseaux de votre rétine.
       actions:
         - action: show_text
-          text: "Imagerie de la rétine (OCT-A)"
+          text: |-
+            Imagerie de la rétine (OCT-A)
 
         - action: hide_illustration
           id: test
 
-        - action: stand_up
-          character: nurse
-          facing: left
-          to:
-            x: 4.75
-            bottom_y: -3.1
+        - action: parallel
+          actions:
 
-        - action: stand_up
-          character: patient
-          facing: left
-          to:
-            x: -1.0
-            bottom_y: -3.1
+          - action: walk_to
+            character: patient
+            facing: left
+            path:
+              - {x: -1.0, bottom_y: -2.7}
+              - {x: -5.2, bottom_y: -1.75}
 
-        - action: walk_to
-          character: patient
-          facing: left
-          path:
-            - {x: -1.0, bottom_y: -2.7}
-            - {x: -5.2, bottom_y: -1.75}
+          - action: walk_to
+            character: nurse
+            facing: left
+            path:
+              - {x: 4.75, bottom_y: -2.7}
+              - {x: 1.0, bottom_y: -1.75}
+              - {x: -1.0, bottom_y: -1.75}
 
         - action: sit_on
           character: patient
@@ -157,48 +154,43 @@ scene:
           pose: sitting
           facing: right
 
-        - action: walk_to
-          character: nurse
-          facing: left
-          path:
-            - {x: 4.75, bottom_y: -2.7}
-            - {x: 1.0, bottom_y: -1.75}
-            - {x: -1.0, bottom_y: -1.75}
-
         - action: sit_on
           character: nurse
           chair: second_ophthalmic_stool
           pose: sitting
           facing: left
 
-    - id: questionnaires
+    - id: octa2
       narration: >
-        Lors de vos visites de suivi, nous récupérons aussi vos questionnaires, si vous avez choisi la version papier.
+        Cet examen permet d'observer la structure et les petits vaisseaux de votre rétine.
       actions:
         - action: show_text
           text:  |-
-            Qualité de vie et vie sociale
+            Imagerie de la rétine (OCT-A)
 
-        - action: walk_to
-          character: patient
-          facing: right
-          path:
-            - {x: -5.2, bottom_y: -1.75}
-            - {x: -1.0, bottom_y: -2.7}
+        - action: parallel
+          actions:
+
+          - action: walk_to
+            character: patient
+            facing: right
+            path:
+              - {x: -5.2, bottom_y: -1.75}
+              - {x: -1.0, bottom_y: -2.7}
+
+          - action: walk_to
+            character: nurse
+            facing: right
+            path:
+              - {x: -1.0, bottom_y: -1.75}
+              - {x: 1.0, bottom_y: -1.75}
+              - {x: 4.75, bottom_y: -2.7}
 
         - action: sit_on
           character: patient
           chair: patient_chair
           pose: sitting
           facing: right
-
-        - action: walk_to
-          character: nurse
-          facing: right
-          path:
-            - {x: -1.0, bottom_y: -1.75}
-            - {x: 1.0, bottom_y: -1.75}
-            - {x: 4.75, bottom_y: -2.7}
 
         - action: sit_on
           character: nurse
@@ -208,6 +200,7 @@ scene:
 
     - id: next_appointment
       narration: >
+        Lors de vos visites de suivi, nous récupérons aussi vos questionnaires, si vous avez choisi la version papier.
         Enfin, avant de repartir, nous fixons ensemble votre prochain rendez-vous, six mois plus tard.
       actions:
         - action: show_text

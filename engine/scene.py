@@ -94,6 +94,7 @@ class EvoluParkScene(Scene):
         bottom_y=None,
         run_time=1.0,
         waypoints=None,
+        defer=False,
     ):
         """Animate walking along a polyline, including vertical movement."""
         from math import hypot
@@ -154,6 +155,8 @@ class EvoluParkScene(Scene):
 
         if not segments:
             place_bottom(obj, *points[-1])
+            if defer:
+                return None, previous_facing
             return previous_facing
 
         # Preload walking frames for each orientation.
@@ -227,18 +230,24 @@ class EvoluParkScene(Scene):
 
             place_bottom(mob, x, y)
 
-        if run_time > 0:
-            self.play(
-                UpdateFromAlphaFunc(
-                    obj,
-                    update,
-                    run_time=run_time,
-                    rate_func=linear,
-                )
-            )
-        else:
+        if run_time <= 0:
             update(obj, 1.0)
+            if defer:
+                return None, segments[-1]["facing"]
+            return segments[-1]["facing"]
 
+        animation = UpdateFromAlphaFunc(
+            obj,
+            update,
+            run_time=run_time,
+            rate_func=linear,
+        )
+
+        if defer:
+            # Prepared but not yet played.
+            return animation, segments[-1]["facing"]
+
+        self.play(animation)
         return segments[-1]["facing"]
 
     def change_pose(self, action):
@@ -334,6 +343,8 @@ class EvoluParkScene(Scene):
             self.stand_up(action)
         elif kind == "walk_to":
             self.walk_to(action, run_time)
+        elif kind == "parallel":
+            self.parallel(action, run_time)
         else:
             raise ValueError(f"Unknown action: {kind}")
 
@@ -343,6 +354,53 @@ class EvoluParkScene(Scene):
         previous = self.illustrations.pop(name, None)
         if previous is not None:
             self.remove(previous["mobject"])
+
+    def parallel(self, action, run_time):
+        """Execute multiple character walks simultaneously."""
+        actions = action.get("actions", [])
+
+        if not actions:
+            raise ValueError("parallel requires at least one action")
+
+        animations = []
+        finishers = []
+        characters = set()
+
+        for sub_action in actions:
+            kind = sub_action["action"]
+
+            if kind != "walk_to":
+                raise ValueError(
+                    f"Unsupported parallel action: {kind}"
+                )
+
+            name = sub_action["character"]
+
+            if name in characters:
+                raise ValueError(
+                    f"Duplicate character in parallel: {name}"
+                )
+
+            characters.add(name)
+
+            animation, finalize = self.walk_to(
+                sub_action,
+                run_time=run_time,
+                defer=True,
+            )
+
+            if animation is not None:
+                animations.append(animation)
+
+            finishers.append(finalize)
+
+        # All animations start and end together.
+        if animations:
+            self.play(*animations)
+
+        # Restore static poses after every movement has finished.
+        for finalize in finishers:
+            finalize()
 
     def place_character(self, action):
         """Place a character immediately, optionally seated on a chair."""
@@ -399,7 +457,7 @@ class EvoluParkScene(Scene):
             duration = float(sequence.get("duration", 2.0))
 
         actions = sequence.get("actions", [])
-        animated = {"walk_to"}
+        animated = {"walk_to", "parallel"}
         animated_count = sum(a["action"] in animated for a in actions)
         motion_time = duration * 0.75 if animated_count else 0.0
         step = motion_time / animated_count if animated_count else 0.0
@@ -564,7 +622,7 @@ class EvoluParkScene(Scene):
             )),
         )
 
-    def walk_to(self, action, run_time):
+    def walk_to(self, action, run_time, defer=False):
         """Walk along optional waypoints or directly to a destination."""
         name = action["character"]
 
@@ -662,17 +720,29 @@ class EvoluParkScene(Scene):
         obj = self.people[name]["mobject"]
         place_bottom(obj, start_x, start_y)
 
-        final_facing = self.animate_walk(
+        result = self.animate_walk(
             obj=obj,
             name=name,
             facing=facing,
             waypoints=waypoints,
             run_time=run_time,
+            defer=defer,
         )
 
-        # Finish standing at the final position.
-        self.change_pose({
-            "character": name,
-            "pose": action.get("end_pose", "standing"),
-            "facing": final_facing,
-        })
+        if defer:
+            animation, final_facing = result
+        else:
+            final_facing = result
+
+        def finalize():
+            """Replace walking frames with the final static pose."""
+            self.change_pose({
+                "character": name,
+                "pose": action.get("end_pose", "standing"),
+                "facing": final_facing,
+            })
+
+        if defer:
+            return animation, finalize
+
+        finalize()
