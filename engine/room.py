@@ -4,16 +4,14 @@
 """Load and render reusable room definitions for EvoluPark Manim scenes.
 
 A room YAML describes wall/floor geometry and a list of scenery objects.
-Objects may be static (``file``) or looped (``animation.frames``). Instances
-may refer to a shared ``common.yaml`` furniture ``type``; local properties
-such as file, size, position, orientation and seat anchors take precedence.
+Objects may be static (``file``) or looped (``animation.frames``).
+Each room object defines its own file, size, position, orientation,
+and optional anchors.
 
 Room animations run through non-blocking updaters, independently of narrated
 scenario actions. ``Room.build(scene)`` returns an index of named objects,
 including metadata needed to attach a seated character to a room chair.
 """
-
-from pathlib import Path
 
 import yaml
 from manim import Line, Rectangle, config
@@ -111,22 +109,13 @@ class Room:
             raise ValueError(f"Duplicate object id in room: {name}")
 
         furniture_type = entry.get("type")
-        defaults = self.shared.get("furniture", {}).get(furniture_type, {})
-        spec = {**defaults, **entry}
-        spec["anchors"] = {**defaults.get("anchors", {}), **entry.get("anchors", {})}
+        spec = entry
 
-        # Explicit room properties override type defaults. In particular, a
-        # width override replaces the inherited furniture height, and a local
-        # animation replaces the furniture type's default static SVG file.
         animated = "animation" in entry
         if animated and "file" in entry:
             raise ValueError(f"'{name}' must not define both 'file' and 'animation'")
         if not animated and not spec.get("file"):
             raise ValueError(f"'{name}' requires a 'file' or 'animation'")
-        if "width" in entry and "height" not in entry:
-            spec.pop("height", None)
-        if "height" in entry and "width" not in entry:
-            spec.pop("width", None)
         if ("height" in spec) == ("width" in spec):
             raise ValueError(f"'{name}' needs exactly one of 'height' or 'width'")
 
@@ -171,5 +160,5 @@ class Room:
             "mobject": obj,
             "type": furniture_type,
             "flipped": flipped,
-            "anchors": spec["anchors"],
+            "anchors": spec.get("anchors", {}),
         }

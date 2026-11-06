@@ -21,12 +21,10 @@ import yaml
 from manim import (
     DOWN,
     LEFT,
-    RIGHT,
     Scene,
     SVGMobject,
     Text,
     UL,
-    UP,
     UpdateFromAlphaFunc,
     UR,
     config,
@@ -79,9 +77,7 @@ class EvoluParkScene(Scene):
     """Orchestrate narrated character actions in a reusable Manim room.
 
     Room objects are registered in ``room_objects`` by their YAML identifiers.
-    Named furniture with a shared type is also available under
-    ``furniture_on_stage``; this supports chair-based positioning with
-    ``sit_on``. Room SVG animations remain active during all scene actions.
+    Room SVG animations remain active during all scene actions.
     """
 
     def animate_walk(
@@ -89,22 +85,12 @@ class EvoluParkScene(Scene):
         obj,
         name,
         facing=None,
-        start_x=None,
-        end_x=None,
-        bottom_y=None,
         run_time=1.0,
         waypoints=None,
         defer=False,
     ):
         """Animate walking along a polyline, including vertical movement."""
         from math import hypot
-
-        # Backward compatibility with horizontal walking.
-        if waypoints is None:
-            waypoints = [
-                (float(start_x), float(bottom_y)),
-                (float(end_x), float(bottom_y)),
-            ]
 
         points = [(float(x), float(y)) for x, y in waypoints]
 
@@ -286,11 +272,6 @@ class EvoluParkScene(Scene):
         self.illustrations = {}
         self.room = Room.from_yaml(room_path, shared=cfg)
         self.room_objects = self.room.build(self)
-        self.furniture_on_stage = {
-            name: state
-            for name, state in self.room_objects.items()
-            if "seat" in state.get("anchors", {})
-        }
 
         style = cfg["style"]
 
@@ -331,12 +312,12 @@ class EvoluParkScene(Scene):
             self.show_illustration(action)
         elif kind == "hide_illustration":
             self.hide_illustration(action)
-        elif kind in {"stop", "change_pose"}:
+        elif kind == "change_pose":
             self.change_pose(action)
         elif kind == "sit_on":
             self.sit_on(action)
         elif kind == "show_text":
-            self.show_text(action, run_time)
+            self.show_text(action)
         elif kind == "place_character":
             self.place_character(action)
         elif kind == "stand_up":
@@ -529,7 +510,7 @@ class EvoluParkScene(Scene):
         self.add(obj)
         self.illustrations[name] = {"mobject": obj}
 
-    def show_text(self, action, run_time=0):
+    def show_text(self, action):
         """Display a caption below the title, replacing the previous one."""
 
         # Remove previous caption.
@@ -606,7 +587,7 @@ class EvoluParkScene(Scene):
 
         self.change_pose({
             "character": name,
-            "pose": "standing",
+            "pose": action.get("pose", "standing"),
             "facing": facing,
         })
 
