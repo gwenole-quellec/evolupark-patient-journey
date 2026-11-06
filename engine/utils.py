@@ -14,10 +14,49 @@ from math import cos, pi, sin
 from pathlib import Path
 
 import numpy as np
+import yaml
 from manim import RIGHT, SVGMobject, UP
 
 
+# ==============================================================================
+# Constants
+# ==============================================================================
+
 ROOT = Path(__file__).resolve().parent.parent
+COMMON_CONFIG = ROOT / "config" / "common.yaml"
+with COMMON_CONFIG.open(encoding="utf-8") as f:
+    common_cfg = yaml.safe_load(f) or {}
+
+
+# ==============================================================================
+# Asset loading
+# ==============================================================================
+
+def load_character(name, pose, facing):
+    """Load one pose of a named character at its configured height and facing.
+
+    ``walking`` is a virtual pose: it uses the first ``walking_frames`` entry,
+    so no ``poses.walking`` entry is required in the shared YAML.
+
+    Returns:
+        A ``(SVGMobject, flipped)`` pair.
+    """
+    spec = common_cfg["characters"][name]
+    if pose == "walking" and spec.get("walking_frames"):
+        path = spec["walking_frames"][0]
+    else:
+        path = spec["poses"][pose]
+
+    native = spec.get("native_facing", "right")
+    if isinstance(native, dict):
+        native = native.get(pose, "right")
+
+    return load_svg(
+        path,
+        spec.get("heights", {}).get(pose, 3.5),
+        native_facing=native,
+        facing=facing,
+    )
 
 
 def load_svg(relative_path, height=None, native_facing="right", facing="right", *, width=None):
@@ -55,6 +94,24 @@ def load_svg(relative_path, height=None, native_facing="right", facing="right", 
     return obj, flipped
 
 
+# ==============================================================================
+# Asset positioning
+# ==============================================================================
+
+def anchor_point(obj, anchor, flipped=False):
+    """Get a normalized bounding-box point, optionally mirrored on X."""
+    x, y = float(anchor["x"]), float(anchor["y"])
+    if flipped:
+        x = 1 - x
+    if not (0 <= x <= 1 and 0 <= y <= 1):
+        raise ValueError(f"Anchor outside [0, 1]: {anchor}")
+    return np.array([
+        obj.get_left()[0] + x * obj.width,
+        obj.get_bottom()[1] + y * obj.height,
+        0.0,
+    ])
+
+
 def place_bottom(obj, x, bottom_y):
     """Position a mobject using horizontal center and its bottom edge."""
     obj.set_x(float(x))
@@ -72,19 +129,9 @@ def place_object(obj, spec):
         obj.move_to([x, float(spec.get("y", 0)), 0])
 
 
-def anchor_point(obj, anchor, flipped=False):
-    """Get a normalized bounding-box point, optionally mirrored on X."""
-    x, y = float(anchor["x"]), float(anchor["y"])
-    if flipped:
-        x = 1 - x
-    if not (0 <= x <= 1 and 0 <= y <= 1):
-        raise ValueError(f"Anchor outside [0, 1]: {anchor}")
-    return np.array([
-        obj.get_left()[0] + x * obj.width,
-        obj.get_bottom()[1] + y * obj.height,
-        0.0,
-    ])
-
+# ==============================================================================
+# Motion utilities
+# ==============================================================================
 
 def add_motion(obj, motion):
     """Attach a configurable looping motion to any Manim mobject."""

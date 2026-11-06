@@ -11,10 +11,9 @@ scene:
     - id: introduction
       narration: >
         À chaque visite, vous réaliserez un test de marche.
-        Cet exercice simple nous permet d'évaluer différents aspects de votre mobilité.
       actions:
         - action: show_text
-          text: "Un test à chaque visite"
+          text: "Évaluation de votre mobilité"
 
         - action: place_character
           character: patient
@@ -31,10 +30,10 @@ scene:
 
     - id: stand_up
       narration: >
-        Nous nous intéressons notamment à votre aisance dans les mouvements du quotidien, comme le passage de la position assise à la position debout.
+        Ce test nous permet d'évaluer votre mobilité dans les gestes du quotidien.
       actions:
         - action: show_text
-          text: "L'aisance dans les mouvements"
+          text: "Aisance des mouvements"
 
         - action: stand_up
           character: patient
@@ -45,25 +44,24 @@ scene:
 
     - id: walk_forward
       narration: >
-        Nous observons également votre vitesse de déplacement et la régularité de vos pas.
-        Ces informations nous aident à mieux comprendre votre façon de marcher.
+        Pendant ce test, nous observons votre aisance, la vitesse ainsi que la régularité de votre marche.
       actions:
         - action: show_text
-          text: "La vitesse et la régularité des pas"
+          text: "Aisance vitesse et régularité"
 
         - action: walk_to
           character: patient
           facing: right
           to:
-            x: 2.8
+            x: 2.5
             bottom_y: -2.6
 
     - id: turn_back
       narration: >
-        Les changements de direction et les passages d'obstacles nous apportent d'autres informations, notamment sur votre équilibre et la coordination de vos mouvements.
+        Le franchissement d'obstacles nous permettrons en outre de repérer d'éventuels blocages de votre marche.
       actions:
         - action: show_text
-          text: "L'équilibre et la coordination"
+          text: "Blocages de la marche"
 
         - action: change_pose
           character: patient
@@ -79,10 +77,11 @@ scene:
 
     - id: sit_down
       narration: >
-        En répétant ce test à chaque visite, nous pourrons suivre l'évolution de votre mobilité tout au long de l'étude.
+        Ces observations nous aideront à suivre
+        l'évolution de votre mobilité au fil du temps.
       actions:
         - action: show_text
-          text: "Le suivi de votre mobilité"
+          text: "Suivi dans le temps"
 
         - action: sit_on
           character: patient

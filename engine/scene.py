@@ -38,6 +38,7 @@ from engine.utils import (
     ROOT,
     add_motion,
     anchor_point,
+    load_character,
     load_svg,
     make_looping_svg,
     place_bottom,
@@ -47,7 +48,7 @@ from engine.voice import generate_voice
 
 
 # ==============================================================================
-# Scenario configuration
+# Constants
 # ==============================================================================
 
 SCENARIO_ENV = os.environ.get("EVOLUPARK_SCENARIO")
@@ -70,32 +71,9 @@ with SCENARIO.open(encoding="utf-8") as f:
 cfg = {**common_cfg, **scenario_cfg}
 
 
-def load_character(name, pose, facing):
-    """Load one pose of a named character at its configured height and facing.
-
-    ``walking`` is a virtual pose: it uses the first ``walking_frames`` entry,
-    so no ``poses.walking`` entry is required in the shared YAML.
-
-    Returns:
-        A ``(SVGMobject, flipped)`` pair.
-    """
-    spec = cfg["characters"][name]
-    if pose == "walking" and spec.get("walking_frames"):
-        path = spec["walking_frames"][0]
-    else:
-        path = spec["poses"][pose]
-
-    native = spec.get("native_facing", "right")
-    if isinstance(native, dict):
-        native = native.get(pose, "right")
-
-    return load_svg(
-        path,
-        spec.get("heights", {}).get(pose, 3.5),
-        native_facing=native,
-        facing=facing,
-    )
-
+# ==============================================================================
+# Scene engine class
+# ==============================================================================
 
 class EvoluParkScene(Scene):
     """Orchestrate narrated character actions in a reusable Manim room.
