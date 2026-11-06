@@ -15,6 +15,7 @@ explanatory text and narration; speech synthesis is in ``engine.voice``.
 """
 
 import os
+from math import hypot
 from pathlib import Path
 
 import yaml
@@ -87,9 +88,18 @@ class EvoluParkScene(Scene):
         waypoints=None,
         defer=False,
     ):
-        """Animate walking along a polyline, including vertical movement."""
-        from math import hypot
+        """Animate walking along a polyline at a specified duration.
 
+        Walking frames are synchronized with the distance traveled,
+        independently of animation duration.
+
+        When defer=True, prepare the animation without playing it.
+
+        Returns:
+            The final facing direction, or an (animation, facing) pair when
+            deferred. The animation is None for a zero-length path or a
+            nonpositive duration.
+        """
         points = [(float(x), float(y)) for x, y in waypoints]
 
         if len(points) < 2:
@@ -304,7 +314,7 @@ class EvoluParkScene(Scene):
         self.wait(0.5)
 
     def execute_action(self, action, run_time=0):
-        """Dispatch a scenario action to its character or caption operation."""
+        """Dispatch a YAML action and return its duration when applicable."""
         kind = action["action"]
         if kind == "show_illustration":
             self.show_illustration(action)
@@ -321,9 +331,9 @@ class EvoluParkScene(Scene):
         elif kind == "stand_up":
             self.stand_up(action)
         elif kind == "walk_to":
-            self.walk_to(action, run_time)
+            return self.walk_to(action)
         elif kind == "parallel":
-            self.parallel(action, run_time)
+            return self.parallel(action)
         else:
             raise ValueError(f"Unknown action: {kind}")
 
@@ -334,8 +344,15 @@ class EvoluParkScene(Scene):
         if previous is not None:
             self.remove(previous["mobject"])
 
-    def parallel(self, action, run_time):
-        """Execute multiple character walks simultaneously."""
+    def parallel(self, action):
+        """Execute multiple walking actions simultaneously.
+
+        Each character uses its own walking speed. Only walk_to actions are
+        supported, and each character may appear at most once.
+
+        Returns:
+            The duration of the longest movement, in seconds.
+        """
         actions = action.get("actions", [])
 
         if not actions:
@@ -344,13 +361,12 @@ class EvoluParkScene(Scene):
         animations = []
         finishers = []
         characters = set()
+        total_duration = 0.0
 
         for sub_action in actions:
-            kind = sub_action["action"]
-
-            if kind != "walk_to":
+            if sub_action["action"] != "walk_to":
                 raise ValueError(
-                    f"Unsupported parallel action: {kind}"
+                    f"Unsupported parallel action: {sub_action['action']}"
                 )
 
             name = sub_action["character"]
@@ -362,9 +378,8 @@ class EvoluParkScene(Scene):
 
             characters.add(name)
 
-            animation, finalize = self.walk_to(
+            animation, finalize, duration = self.walk_to(
                 sub_action,
-                run_time=run_time,
                 defer=True,
             )
 
@@ -372,14 +387,15 @@ class EvoluParkScene(Scene):
                 animations.append(animation)
 
             finishers.append(finalize)
+            total_duration = max(total_duration, duration)
 
-        # All animations start and end together.
         if animations:
             self.play(*animations)
 
-        # Restore static poses after every movement has finished.
         for finalize in finishers:
             finalize()
+
+        return total_duration
 
     def place_character(self, action):
         """Place a character immediately, optionally seated on a chair."""
@@ -423,28 +439,36 @@ class EvoluParkScene(Scene):
             })
 
     def run_sequence(self, sequence):
-        """Play narrated actions, leaving remaining narration time for a pause.
+        """Execute a sequence with narration and independent action timing.
 
-        Room animation updaters keep running during movements and pauses. Speech
-        audio is generated/cached by ``engine.voice`` and added once per sequence.
+        Narration starts at the beginning of the sequence. Actions run
+        sequentially, except those grouped in a parallel action.
+
+        The sequence continues until both the narration and all actions have
+        finished, respecting any configured minimum duration.
         """
         narration = sequence.get("narration", "").strip()
+
         if narration:
-            audio_path, duration = generate_voice(narration, cfg["voice"])
+            audio_path, audio_duration = generate_voice(
+                narration, cfg["voice"]
+            )
             self.add_sound(str(audio_path))
         else:
-            duration = float(sequence.get("duration", 2.0))
+            audio_duration = 0.0
 
-        actions = sequence.get("actions", [])
-        animated = {"walk_to", "parallel"}
-        animated_count = sum(a["action"] in animated for a in actions)
-        motion_time = duration * 0.75 if animated_count else 0.0
-        step = motion_time / animated_count if animated_count else 0.0
+        elapsed = 0.0
 
-        for action in actions:
-            self.execute_action(action, step if action["action"] in animated else 0)
+        for action in sequence.get("actions", []):
+            elapsed += self.execute_action(action) or 0.0
 
-        remaining = duration - motion_time
+        # Optional minimum sequence duration.
+        minimum_duration = float(sequence.get("duration", 0.0))
+        target_duration = max(audio_duration, minimum_duration)
+
+        # Wait if the narration is longer than the visual actions.
+        remaining = target_duration - elapsed
+
         if remaining > 0:
             self.wait(remaining)
 
@@ -534,7 +558,7 @@ class EvoluParkScene(Scene):
         }
 
     def stand_up(self, action):
-        """Change a seated character to standing at a specified position."""
+        """Instantly change a character to a standing pose and reposition it."""
         name = action["character"]
 
         if name not in self.people:
@@ -561,8 +585,19 @@ class EvoluParkScene(Scene):
             )),
         )
 
-    def walk_to(self, action, run_time, defer=False):
-        """Walk along optional waypoints or directly to a destination."""
+    def walk_to(self, action, defer=False):
+        """Move a character along a path at its configured walking speed.
+
+        Accepts a destination or multiple waypoints, with optional entry from
+        outside the frame. Walking speed and final pose can be overridden by
+        the action.
+
+        When deferred, prepare the animation without playing it.
+
+        Returns:
+            The movement duration, or an (animation, finalize, duration) tuple
+            when deferred.
+        """
         name = action["character"]
 
         if "path" in action:
@@ -633,6 +668,25 @@ class EvoluParkScene(Scene):
                 float(target.get("bottom_y", last_y)),
             ))
 
+        # Distance along the complete trajectory, including waypoints.
+        distance = sum(
+            hypot(x1 - x0, y1 - y0)
+            for (x0, y0), (x1, y1)
+            in zip(waypoints[:-1], waypoints[1:])
+        )
+
+        speed = float(action.get(
+            "speed",
+            cfg["characters"][name].get("walk_speed", 1.5),
+        ))
+
+        if speed <= 0:
+            raise ValueError(
+                f"{name}: walk_speed must be positive"
+            )
+
+        run_time = distance / speed if distance > 1e-8 else 0.0
+
         # Determine initial walking direction.
         facing = action.get("facing")
 
@@ -682,6 +736,7 @@ class EvoluParkScene(Scene):
             })
 
         if defer:
-            return animation, finalize
+            return animation, finalize, run_time
 
         finalize()
+        return run_time

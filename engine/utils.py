@@ -1,13 +1,13 @@
 # SPDX-FileCopyrightText: 2026 Gwenolé Quellec
 # SPDX-License-Identifier: MIT
 
-"""Shared SVG geometry and frame-cycling helpers for EvoluPark/Manim.
+"""Shared SVG loading, positioning, and animation utilities for EvoluPark.
 
-This module does not depend on the current scenario. It is reusable from
-``engine.scene`` (characters) and ``engine.room`` (room decorations).
-All asset paths are relative to the project root; normalized anchors use a
-bottom-left origin. Continuous SVG animation is driven by Manim updaters,
-not by blocking ``Scene.play`` calls.
+This module provides reusable helpers for scene and room objects, including
+character poses, normalized anchors, and SVG frame cycling.
+
+Asset paths are relative to the project root. Normalized anchors use a
+bottom-left origin. Looping animations use non-blocking Manim updaters.
 """
 
 from math import cos, pi, sin
@@ -36,15 +36,18 @@ def build_svg_object(spec):
     """Build a static or looping SVG object from a YAML specification.
 
     Supports:
-        - file or animation.frames
-        - width or height
-        - x, y or bottom_y
-        - native_facing and facing
-        - opacity and z_index
-        - optional periodic motion
+        - Static SVG files or animated frame sequences
+        - Width or height scaling
+        - Horizontal position and center/bottom vertical alignment
+        - Horizontal flipping
+        - Opacity and z-index
+        - Optional periodic motion
+
+    Args:
+        spec: YAML object definition.
 
     Returns:
-        (mobject, flipped)
+        A (mobject, flipped) pair.
     """
     name = spec.get("id", "<unnamed>")
     animated = "animation" in spec
@@ -208,7 +211,15 @@ def place_object(obj, spec):
 # ==============================================================================
 
 def add_motion(obj, motion):
-    """Attach a configurable looping motion to any Manim mobject."""
+    """Attach a periodic position updater to a Manim mobject.
+
+    Supports 'ping_pong' (movement followed by a pause) and 'sine'
+    (continuous oscillation). Motion amplitude, period, and phase
+    are specified in the motion configuration.
+
+    Returns:
+        The original mobject with its updater attached.
+    """
     if not motion:
         return obj
 
@@ -253,14 +264,19 @@ def add_motion(obj, motion):
 
 
 def make_looping_svg(frames, *, period, initial_phase=0.0, z_index=0):
-    """Create a Manim mobject that cycles preloaded SVG poses continuously.
+    """Cycle through preloaded SVG frames using a Manim updater.
 
-    Each input frame must already be scaled and positioned. The entire list is
-    cached in memory, so no SVG is parsed by the per-frame updater. ``period``
-    is the full animation-cycle duration in seconds, not the delay per SVG.
+    Frames must already be scaled and positioned. No SVG is loaded
+    during animation.
 
-    The returned object advances automatically whenever Manim renders a frame
-    (during ``Scene.play`` and ``Scene.wait``), including while audio is played.
+    Args:
+        frames: Preloaded SVG mobjects.
+        period: Duration of one complete cycle, in seconds.
+        initial_phase: Initial offset within the cycle, in seconds.
+        z_index: Rendering layer of the animated object.
+
+    Returns:
+        A mobject with a non-blocking frame-cycling updater.
     """
     if not frames:
         raise ValueError("A looping animation needs at least one SVG frame")

@@ -198,9 +198,17 @@ scene:
           pose: sitting
           facing: left
 
-    - id: next_appointment
+    - id: questionnaires
       narration: >
         Lors de vos visites de suivi, nous récupérons aussi vos questionnaires, si vous avez choisi la version papier.
+      actions:
+        - action: show_text
+          text:  |-
+            Récupération des
+            questionnaires
+
+    - id: next_appointment
+      narration: >
         Enfin, avant de repartir, nous fixons ensemble votre prochain rendez-vous, six mois plus tard.
       actions:
         - action: show_text

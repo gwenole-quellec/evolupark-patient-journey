@@ -44,7 +44,8 @@ characters:
       - assets/characters/patient/walking4.svg
       - assets/characters/patient/walking5.svg
       - assets/characters/patient/walking6.svg
-    walk_cycle_length: 2.5
+    walk_cycle_length: 2.0
+    walk_speed: 1.2
 
   neurologist:
     native_facing: right
@@ -66,6 +67,7 @@ characters:
       - assets/characters/neurologist/walking5.svg
       - assets/characters/neurologist/walking6.svg
     walk_cycle_length: 2.0
+    walk_speed: 1.5
 
   nurse:
     native_facing: right
@@ -89,3 +91,4 @@ characters:
       - assets/characters/nurse/walking5.svg
       - assets/characters/nurse/walking6.svg
     walk_cycle_length: 2.0
+    walk_speed: 1.5

@@ -3,38 +3,12 @@
 
 """Generate and cache voice-over audio for EvoluPark animations.
 
-The YAML configuration selects an offline Piper voice (``local: true``) or
-Microsoft Edge TTS (``local: false``). Piper produces WAV files, while Edge
-TTS produces MP3 files. Both are cached in ``.cache/voice/``.
+Supports offline synthesis with Piper (WAV) and remote synthesis with Microsoft
+Edge TTS (MP3), selected through the YAML voice configuration.
 
-To use an offline Piper voice, install Piper and the French Siwis voice (once,
-from the project root)::
-
-    mkdir -p assets/voices
-    python -m piper.download_voices --data-dir assets/voices fr_FR-siwis-medium
-
-The download creates ``fr_FR-siwis-medium.onnx`` and the accompanying
-``fr_FR-siwis-medium.onnx.json`` under ``assets/voices/``. After the download,
-Piper synthesis is fully offline. To use a different local voice, download its
-model to the same directory and change ``voice.model`` in the YAML.
-
-Example YAML for local synthesis::
-
-    voice:
-      local: true
-      model: fr_FR-siwis-medium
-      speaker: 0
-      length_scale: 1.05
-
-Example YAML for remote synthesis (requires ``edge-tts`` and Internet)::
-
-    voice:
-      local: false
-      name: fr-FR-VivienneMultilingualNeural
-      rate: "-5%"
-
-Only this module owns the synthesis dependencies, audio cache, and duration
-measurement. The Manim scene uses ``generate_voice(text, voice_config)``.
+Generated audio is cached in .cache/voice/ using a hash of the text and
+synthesis parameters. The cache avoids repeated synthesis and provides the audio
+duration needed for scene synchronization.
 """
 
 import asyncio
@@ -61,22 +35,27 @@ AUDIO_CACHE = ROOT / ".cache" / "voice"
 # ==============================================================================
 
 def generate_voice(text: str, voice_config: dict) -> tuple[Path, float]:
-    """Generate or reuse narrated audio with Piper or Edge TTS.
+    """Generate or retrieve cached narration audio.
+
+    Normalizes whitespace, selects Piper or Edge TTS according to the voice
+    configuration, and reuses previously generated audio when available.
 
     Args:
-        text: Narration text, as written in the scenario.
-        voice_config: The YAML ``voice`` mapping, including ``local`` and
-            the selected engine's configuration options.
+        text: Narration text to synthesize.
+        voice_config: YAML voice configuration, including the synthesis engine
+            and its parameters.
 
     Returns:
-        A tuple ``(audio_path, duration_seconds)`` suitable for Manim's
-        ``add_sound()`` and sequence timing.
+        A tuple (audio_path, duration_seconds), suitable for Manim audio
+            playback and sequence synchronization.
 
     Raises:
-        ValueError: If ``voice.local`` is not boolean or Piper's speech
-            duration scaling is not positive.
-        FileNotFoundError: If the requested local Piper model is missing.
+        ValueError: If voice.local is not boolean or Piper's length_scale is not
+            positive.
+        FileNotFoundError: If a required Piper model or its configuration file
+            is missing.
         subprocess.CalledProcessError: If Piper synthesis fails.
+        edge_tts.exceptions.NoAudioReceived: If Edge TTS returns no audio data.
     """
     text = " ".join(text.split())
     local = voice_config.get("local", False)
@@ -109,9 +88,13 @@ def generate_voice(text: str, voice_config: dict) -> tuple[Path, float]:
                 model_path = ROOT / "assets" / "voices" / f"{model}.onnx"
                 config_path = Path(f"{model_path}.json")
                 if not model_path.is_file():
-                    raise FileNotFoundError(f"Piper model not found: {model_path}")
+                    raise FileNotFoundError(
+                        f"Piper model not found: {model_path}"
+                    )
                 if not config_path.is_file():
-                    raise FileNotFoundError(f"Piper model config not found: {config_path}")
+                    raise FileNotFoundError(
+                        f"Piper model config not found: {config_path}"
+                    )
 
                 subprocess.run(
                     [

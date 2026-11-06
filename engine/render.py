@@ -1,16 +1,15 @@
 # SPDX-FileCopyrightText: 2026 Gwenolé Quellec
 # SPDX-License-Identifier: MIT
 
-"""Command-line entry point for rendering an EvoluPark YAML scenario.
+"""Command-line launcher for EvoluPark YAML scenarios.
 
-Select a named scenario and preview quality, then launch Manim with the
-corresponding configuration. Rendering logic lives in ``scene.py``.
+Resolves the requested scenario, selects the rendering quality,
+and launches Manim in a subprocess with the appropriate environment.
 
-Examples
---------
-python engine/render.py inclusion --low
-python engine/render.py inclusion --medium
-python engine/render.py inclusion --high
+Examples:
+    python engine/render.py inclusion --low
+    python engine/render.py inclusion --medium
+    python engine/render.py inclusion --high
 """
 
 import argparse
@@ -39,7 +38,7 @@ QUALITY_FLAGS = {
 # ==============================================================================
 
 def resolve_scenario(name):
-    """Validate a scenario name and return its absolute YAML file path."""
+    """Validate a scenario name and return its stem and absolute YAML path."""
     stem = name[:-5] if name.endswith(".yaml") else name
     if not re.fullmatch(r"[A-Za-z0-9_-]+", stem):
         raise ValueError(f"Invalid scenario name: {name!r}")
@@ -50,7 +49,7 @@ def resolve_scenario(name):
 
 
 def build_command(name, quality):
-    """Build the Manim command while keeping output naming scenario-based."""
+    """Build the Manim command with the requested quality and output name."""
     return [
         sys.executable, "-m", "manim",
         "-p", QUALITY_FLAGS[quality],

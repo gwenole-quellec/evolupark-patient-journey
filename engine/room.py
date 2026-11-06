@@ -5,8 +5,8 @@
 
 A room YAML describes wall/floor geometry and a list of scenery objects.
 Objects may be static (``file``) or looped (``animation.frames``).
-Each room object defines its own file, size, position, orientation,
-and optional anchors.
+Each object defines its own SVG file or animation frames, dimensions,
+position, orientation, and optional anchors.
 
 Room animations run through non-blocking updaters, independently of narrated
 scenario actions. ``Room.build(scene)`` returns an index of named objects,
@@ -23,7 +23,7 @@ class Room:
     """A reusable background and object layout shared by several scenarios."""
 
     def __init__(self, definition, *, shared, source=None):
-        """Store a parsed room definition and the merged global configuration."""
+        """Store the room definition, shared configuration, and source path."""
         if not isinstance(definition, dict):
             raise ValueError(f"Room YAML must be a mapping: {source}")
         self.definition = definition
@@ -33,7 +33,7 @@ class Room:
 
     @classmethod
     def from_yaml(cls, relative_path, *, shared):
-        """Read a room YAML path relative to the repository root."""
+        """Load a room definition from a project-relative YAML path."""
         path = (ROOT / relative_path).resolve()
         if not path.is_relative_to(ROOT.resolve()):
             raise ValueError(f"Room path is outside the project: {relative_path}")
