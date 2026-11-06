@@ -106,58 +106,6 @@ class EvoluParkScene(Scene):
     ``sit_on``. Room SVG animations remain active during all scene actions.
     """
 
-    def construct(self):
-        """Build the selected room, add branding, then run scenario sequences."""
-        scene_cfg = cfg.get("scene", {})
-        room_path = scene_cfg.get("room")
-        if not room_path:
-            raise ValueError(
-                f"Scenario {SCENARIO} must define 'scene.room' "
-                "(e.g. 'rooms/examination.yaml')."
-            )
-
-        self.people = {}
-        self.illustrations = {}
-        self.room = Room.from_yaml(room_path, shared=cfg)
-        self.room_objects = self.room.build(self)
-        self.furniture_on_stage = {
-            name: state
-            for name, state in self.room_objects.items()
-            if "seat" in state.get("anchors", {})
-        }
-
-        style = cfg["style"]
-
-        # Keep title and logo above all room objects and characters.
-        title = Text(
-            cfg["title"],
-            font=style.get("font", "Liberation Sans"),
-            weight="BOLD",
-            font_size=32,
-            color=style["brand_teal"],
-        )
-        if title.width > 8.7:
-            title.scale_to_fit_width(8.7)
-        title.to_corner(UL, buff=0.4)
-        title.set_z_index(20)
-        self.add(title)
-        self.title = title
-        self.current_text = None
-
-        logo_cfg = cfg.get("logo", {})
-        logo_path = ROOT / logo_cfg.get("file", "assets/logo/evolupark.svg")
-        if not logo_path.is_file():
-            raise FileNotFoundError(logo_path)
-        logo = SVGMobject(str(logo_path))
-        logo.scale_to_fit_width(float(logo_cfg.get("width", 1.65)))
-        logo.to_corner(UR, buff=0.35)
-        logo.set_z_index(20)
-        self.add(logo)
-
-        for sequence in scene_cfg["sequences"]:
-            self.run_sequence(sequence)
-        self.wait(0.5)
-
     def animate_walk(
         self,
         obj,
@@ -241,53 +189,6 @@ class EvoluParkScene(Scene):
             )
         )
 
-    def enter(self, action, run_time):
-        """Introduce a character from a frame edge to its target position."""
-        name = action["character"]
-        if name in self.people:
-            raise ValueError(f"Character already on stage: {name}")
-
-        pose = action["pose"]
-        facing = action.get("facing", "right")
-        obj, flipped = load_character(name, pose, facing)
-        obj.set_z_index(2)
-
-        destination = action["to"]
-        x = float(destination["x"])
-        bottom_y = float(destination.get("bottom_y", self.room.floor_y))
-        side = action["from"]
-        if side not in {"left", "right"}:
-            raise ValueError(f"Invalid entry side: {side}")
-
-        sign = -1 if side == "left" else 1
-        start_x = sign * (config.frame_width / 2 + obj.width / 2 + 0.2)
-        place_bottom(obj, start_x, bottom_y)
-        self.add(obj)
-
-        if pose == "walking":
-            self.animate_walk(
-                obj=obj,
-                name=name,
-                facing=facing,
-                start_x=start_x,
-                end_x=x,
-                bottom_y=bottom_y,
-                run_time=run_time,
-            )
-        else:
-            self.play(
-                obj.animate.shift((x - start_x) * RIGHT),
-                run_time=run_time,
-                rate_func=linear,
-            )
-
-        self.people[name] = {
-            "mobject": obj,
-            "pose": pose,
-            "facing": facing,
-            "flipped": flipped,
-        }
-
     def change_pose(self, action):
         """Instantly replace a character's pose without shifting its feet."""
         name = action["character"]
@@ -310,43 +211,153 @@ class EvoluParkScene(Scene):
             "flipped": flipped,
         }
 
-    def sit_on(self, action):
-        """Align the character's seat anchor with a named room chair's anchor."""
-        name = action["character"]
-        previous = self.people[name]
-        pose = action.get("pose", "sitting")
-        facing = action.get("facing", previous["facing"])
-        chair_id = action["chair"]
-
-        if chair_id not in self.room_objects:
-            raise ValueError(f"Unknown room object for sit_on: {chair_id!r}")
-        chair_state = self.room_objects[chair_id]
-        chair_anchor = chair_state.get("anchors", {}).get("seat")
-        if chair_anchor is None:
+    def construct(self):
+        """Build the selected room, add branding, then run scenario sequences."""
+        scene_cfg = cfg.get("scene", {})
+        room_path = scene_cfg.get("room")
+        if not room_path:
             raise ValueError(
-                f"Room object {chair_id!r} has no 'anchors.seat'. "
-                "Define this anchor in the room YAML."
+                f"Scenario {SCENARIO} must define 'scene.room' "
+                "(e.g. 'rooms/examination.yaml')."
             )
 
-        character_spec = cfg["characters"][name]
-        character_anchor = character_spec["anchors"][pose]["seat"]
-        new, flipped = load_character(name, pose, facing)
+        self.people = {}
+        self.illustrations = {}
+        self.room = Room.from_yaml(room_path, shared=cfg)
+        self.room_objects = self.room.build(self)
+        self.furniture_on_stage = {
+            name: state
+            for name, state in self.room_objects.items()
+            if "seat" in state.get("anchors", {})
+        }
 
-        target = anchor_point(
-            chair_state["mobject"], chair_anchor, chair_state["flipped"]
+        style = cfg["style"]
+
+        # Keep title and logo above all room objects and characters.
+        title = Text(
+            cfg["title"],
+            font=style.get("font", "Liberation Sans"),
+            weight="BOLD",
+            font_size=32,
+            color=style["brand_teal"],
         )
-        current = anchor_point(new, character_anchor, flipped)
-        new.shift(target - current)
-        new.set_z_index(2)
+        if title.width > 8.7:
+            title.scale_to_fit_width(8.7)
+        title.to_corner(UL, buff=0.4)
+        title.set_z_index(20)
+        self.add(title)
+        self.title = title
+        self.current_text = None
 
-        self.remove(previous["mobject"])
-        self.add(new)
+        logo_cfg = cfg.get("logo", {})
+        logo_path = ROOT / logo_cfg.get("file", "assets/logo/evolupark.svg")
+        if not logo_path.is_file():
+            raise FileNotFoundError(logo_path)
+        logo = SVGMobject(str(logo_path))
+        logo.scale_to_fit_width(float(logo_cfg.get("width", 1.65)))
+        logo.to_corner(UR, buff=0.35)
+        logo.set_z_index(20)
+        self.add(logo)
+
+        for sequence in scene_cfg["sequences"]:
+            self.run_sequence(sequence)
+        self.wait(0.5)
+
+    def execute_action(self, action, run_time=0):
+        """Dispatch a scenario action to its character or caption operation."""
+        kind = action["action"]
+        if kind == "show_illustration":
+            self.show_illustration(action)
+        elif kind == "hide_illustration":
+            self.hide_illustration(action)
+        elif kind in {"stop", "change_pose"}:
+            self.change_pose(action)
+        elif kind == "sit_on":
+            self.sit_on(action)
+        elif kind == "show_text":
+            self.show_text(action, run_time)
+        elif kind == "place_character":
+            self.place_character(action)
+        elif kind == "stand_up":
+            self.stand_up(action)
+        elif kind == "walk_to":
+            self.walk_to(action, run_time)
+        else:
+            raise ValueError(f"Unknown action: {kind}")
+
+    def hide_illustration(self, action):
+        """Remove a named illustration immediately."""
+        name = action["id"]
+        previous = self.illustrations.pop(name, None)
+        if previous is not None:
+            self.remove(previous["mobject"])
+
+    def place_character(self, action):
+        """Place a character immediately, optionally seated on a chair."""
+        name = action["character"]
+
+        if name in self.people:
+            raise ValueError(f"Character already on stage: {name}")
+
+        pose = action.get("pose", "standing")
+        facing = action.get("facing", "right")
+
+        obj, flipped = load_character(name, pose, facing)
+        obj.set_z_index(2)
+
+        if "chair" not in action:
+            position = action.get("at", action)
+            x = float(position["x"])
+            bottom_y = float(
+                position.get(
+                    "bottom_y",
+                    self.room.definition.get("character_ground_y", -2.6),
+                )
+            )
+            place_bottom(obj, x, bottom_y)
+
+        self.add(obj)
+
         self.people[name] = {
-            "mobject": new,
+            "mobject": obj,
             "pose": pose,
             "facing": facing,
             "flipped": flipped,
         }
+
+        if "chair" in action:
+            self.sit_on({
+                "character": name,
+                "chair": action["chair"],
+                "pose": pose,
+                "facing": facing,
+            })
+
+    def run_sequence(self, sequence):
+        """Play narrated actions, leaving remaining narration time for a pause.
+
+        Room animation updaters keep running during movements and pauses. Speech
+        audio is generated/cached by ``engine.voice`` and added once per sequence.
+        """
+        narration = sequence.get("narration", "").strip()
+        if narration:
+            audio_path, duration = generate_voice(narration, cfg["voice"])
+            self.add_sound(str(audio_path))
+        else:
+            duration = float(sequence.get("duration", 2.0))
+
+        actions = sequence.get("actions", [])
+        animated = {"walk_to"}
+        animated_count = sum(a["action"] in animated for a in actions)
+        motion_time = duration * 0.75 if animated_count else 0.0
+        step = motion_time / animated_count if animated_count else 0.0
+
+        for action in actions:
+            self.execute_action(action, step if action["action"] in animated else 0)
+
+        remaining = duration - motion_time
+        if remaining > 0:
+            self.wait(remaining)
 
     def show_illustration(self, action):
         """Show or replace a static or looping scenario illustration."""
@@ -408,13 +419,6 @@ class EvoluParkScene(Scene):
         self.add(obj)
         self.illustrations[name] = {"mobject": obj}
 
-    def hide_illustration(self, action):
-        """Remove a named illustration immediately."""
-        name = action["id"]
-        previous = self.illustrations.pop(name, None)
-        if previous is not None:
-            self.remove(previous["mobject"])
-
     def show_text(self, action, run_time=0):
         """Display a caption below the title, replacing the previous one."""
 
@@ -442,46 +446,151 @@ class EvoluParkScene(Scene):
         self.add(message)
         self.current_text = message
 
-    def execute_action(self, action, run_time=0):
-        """Dispatch a scenario action to its character or caption operation."""
-        kind = action["action"]
-        if kind == "show_illustration":
-            self.show_illustration(action)
-        elif kind == "hide_illustration":
-            self.hide_illustration(action)
-        elif kind == "enter":
-            self.enter(action, run_time)
-        elif kind in {"stop", "change_pose"}:
-            self.change_pose(action)
-        elif kind == "sit_on":
-            self.sit_on(action)
-        elif kind == "show_text":
-            self.show_text(action, run_time)
+    def sit_on(self, action):
+        """Align the character's seat anchor with a named room chair's anchor."""
+        name = action["character"]
+        previous = self.people[name]
+        pose = action.get("pose", "sitting")
+        facing = action.get("facing", previous["facing"])
+        chair_id = action["chair"]
+
+        if chair_id not in self.room_objects:
+            raise ValueError(f"Unknown room object for sit_on: {chair_id!r}")
+        chair_state = self.room_objects[chair_id]
+        chair_anchor = chair_state.get("anchors", {}).get("seat")
+        if chair_anchor is None:
+            raise ValueError(
+                f"Room object {chair_id!r} has no 'anchors.seat'. "
+                "Define this anchor in the room YAML."
+            )
+
+        character_spec = cfg["characters"][name]
+        character_anchor = character_spec["anchors"][pose]["seat"]
+        new, flipped = load_character(name, pose, facing)
+
+        target = anchor_point(
+            chair_state["mobject"], chair_anchor, chair_state["flipped"]
+        )
+        current = anchor_point(new, character_anchor, flipped)
+        new.shift(target - current)
+        new.set_z_index(2)
+
+        self.remove(previous["mobject"])
+        self.add(new)
+        self.people[name] = {
+            "mobject": new,
+            "pose": pose,
+            "facing": facing,
+            "flipped": flipped,
+        }
+
+    def stand_up(self, action):
+        """Change a seated character to standing at a specified position."""
+        name = action["character"]
+
+        if name not in self.people:
+            raise ValueError(f"Unknown character: {name}")
+
+        previous = self.people[name]
+        facing = action.get("facing", previous["facing"])
+
+        self.change_pose({
+            "character": name,
+            "pose": "standing",
+            "facing": facing,
+        })
+
+        position = action["to"]
+        obj = self.people[name]["mobject"]
+
+        place_bottom(
+            obj,
+            float(position["x"]),
+            float(position.get(
+                "bottom_y",
+                self.room.definition.get("character_ground_y", -2.6),
+            )),
+        )
+
+    def walk_to(self, action, run_time):
+        """Walk an existing character horizontally to a destination."""
+        name = action["character"]
+
+        if name not in self.people:
+            side = action.get("from")
+            if side not in {"left", "right"}:
+                raise ValueError(
+                    f"Character {name!r} is not on stage. "
+                    "Specify 'from: left' or 'from: right'."
+                )
+
+            facing = action.get(
+                "facing", "right" if side == "left" else "left"
+            )
+
+            obj, flipped = load_character(name, "walking", facing)
+
+            sign = -1 if side == "left" else 1
+            start_x = sign * (
+                config.frame_width / 2 + obj.width / 2 + 0.2
+            )
+
+            bottom_y = float(
+                action["to"].get("bottom_y", self.room.floor_y)
+            )
+
+            place_bottom(obj, start_x, bottom_y)
+            obj.set_z_index(2)
+            self.add(obj)
+
+            self.people[name] = {
+                "mobject": obj,
+                "pose": "walking",
+                "facing": facing,
+                "flipped": flipped,
+            }
+
+        previous = self.people[name]
+        obj = previous["mobject"]
+
+        start_x = float(obj.get_center()[0])
+        end_x = float(action["to"]["x"])
+
+        bottom_y = float(
+            action["to"].get("bottom_y", obj.get_bottom()[1])
+        )
+
+        facing = action.get(
+            "facing",
+            "right" if end_x >= start_x else "left",
+        )
+
+        # Switch to the first walking frame.
+        self.change_pose({
+            "character": name,
+            "pose": "walking",
+            "facing": facing,
+        })
+
+        obj = self.people[name]["mobject"]
+        place_bottom(obj, start_x, bottom_y)
+
+        if run_time > 0 and abs(end_x - start_x) > 1e-6:
+            self.animate_walk(
+                obj=obj,
+                name=name,
+                facing=facing,
+                start_x=start_x,
+                end_x=end_x,
+                bottom_y=bottom_y,
+                run_time=run_time,
+            )
         else:
-            raise ValueError(f"Unknown action: {kind}")
+            place_bottom(obj, end_x, bottom_y)
 
-    def run_sequence(self, sequence):
-        """Play narrated actions, leaving remaining narration time for a pause.
-
-        Room animation updaters keep running during movements and pauses. Speech
-        audio is generated/cached by ``engine.voice`` and added once per sequence.
-        """
-        narration = sequence.get("narration", "").strip()
-        if narration:
-            audio_path, duration = generate_voice(narration, cfg["voice"])
-            self.add_sound(str(audio_path))
-        else:
-            duration = float(sequence.get("duration", 2.0))
-
-        actions = sequence.get("actions", [])
-        animated = {"enter"}
-        animated_count = sum(a["action"] in animated for a in actions)
-        motion_time = duration * 0.75 if animated_count else 0.0
-        step = motion_time / animated_count if animated_count else 0.0
-
-        for action in actions:
-            self.execute_action(action, step if action["action"] in animated else 0)
-
-        remaining = duration - motion_time
-        if remaining > 0:
-            self.wait(remaining)
+        # Finish standing rather than frozen mid-stride.
+        self.change_pose({
+            "character": name,
+            "pose": action.get("end_pose", "standing"),
+            "facing": facing,
+        })

@@ -71,11 +71,13 @@ characters:
     native_facing: right
     poses:
       standing: assets/characters/nurse/standing.svg
+      standing_with_tablet: assets/characters/nurse/nurse-with-tablet.svg
       sitting: assets/characters/nurse/sitting.svg
     heights:
       walking: 3.5
       standing: 3.5
       sitting: 2.8
+      standing_with_tablet: 3.5
     anchors:
       sitting:
         seat: {x: 0.44, y: 0.29}

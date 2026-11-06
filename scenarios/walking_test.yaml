@@ -1,0 +1,91 @@
+
+# SPDX-FileCopyrightText: 2026 EvoluPark Contributors
+# SPDX-License-Identifier: MIT
+
+title: "Le test de marche"
+
+scene:
+  room: rooms/movement_lab.yaml
+
+  sequences:
+    - id: introduction
+      narration: >
+        À chaque visite, vous réaliserez un test de marche.
+        Cet exercice simple nous permet d'évaluer différents aspects de votre mobilité.
+      actions:
+        - action: show_text
+          text: "Un test à chaque visite"
+
+        - action: place_character
+          character: patient
+          pose: sitting
+          chair: walking_course_chair
+          facing: right
+
+        - action: place_character
+          character: nurse
+          pose: standing_with_tablet
+          facing: left
+          x: 4.5
+          bottom_y: -2.6
+
+    - id: stand_up
+      narration: >
+        Nous nous intéressons notamment à votre aisance dans les mouvements du quotidien, comme le passage de la position assise à la position debout.
+      actions:
+        - action: show_text
+          text: "L'aisance dans les mouvements"
+
+        - action: stand_up
+          character: patient
+          facing: right
+          to:
+            x: -2.4
+            bottom_y: -2.6
+
+    - id: walk_forward
+      narration: >
+        Nous observons également votre vitesse de déplacement et la régularité de vos pas.
+        Ces informations nous aident à mieux comprendre votre façon de marcher.
+      actions:
+        - action: show_text
+          text: "La vitesse et la régularité des pas"
+
+        - action: walk_to
+          character: patient
+          facing: right
+          to:
+            x: 2.8
+            bottom_y: -2.6
+
+    - id: turn_back
+      narration: >
+        Les changements de direction et les passages d'obstacles nous apportent d'autres informations, notamment sur votre équilibre et la coordination de vos mouvements.
+      actions:
+        - action: show_text
+          text: "L'équilibre et la coordination"
+
+        - action: change_pose
+          character: patient
+          pose: standing
+          facing: left
+
+        - action: walk_to
+          character: patient
+          facing: left
+          to:
+            x: -2.4
+            bottom_y: -2.6
+
+    - id: sit_down
+      narration: >
+        En répétant ce test à chaque visite, nous pourrons suivre l'évolution de votre mobilité tout au long de l'étude.
+      actions:
+        - action: show_text
+          text: "Le suivi de votre mobilité"
+
+        - action: sit_on
+          character: patient
+          chair: walking_course_chair
+          pose: sitting
+          facing: right

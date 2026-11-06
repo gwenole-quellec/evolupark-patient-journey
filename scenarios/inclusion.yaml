@@ -16,19 +16,13 @@ scene:
           text: |-
             Votre rendez-vous au CHU de Brest
 
-        - action: enter
+        - action: walk_to
           character: patient
-          pose: walking
           facing: right
           from: left
           to:
             x: -1.0
             bottom_y: -3.1
-
-        - action: stop
-          character: patient
-          pose: standing
-          facing: right
 
     - id: seating
       narration: >
@@ -39,19 +33,13 @@ scene:
           text: |-
             Rencontre avec la neurologue
 
-        - action: enter
+        - action: walk_to
           character: neurologist
-          pose: walking
           facing: left
           from: right
           to:
             x: 4.75
             bottom_y: -3.1
-
-        - action: stop
-          character: neurologist
-          pose: standing
-          facing: left
 
         - action: sit_on
           character: patient
