@@ -23,6 +23,22 @@ objects:
     z_index: -2
     facing: left
 
+  - id: cone1
+    file: assets/furniture/cone.svg
+    x: 1.0
+    bottom_y: -2.4
+    height: 0.7
+    z_index: -2
+    facing: left
+
+  - id: cone2
+    file: assets/furniture/cone.svg
+    x: 0.7
+    bottom_y: -2.9
+    height: 0.7
+    z_index: 10
+    facing: left
+
   - id: walking_course_chair
     type: chair
     file: assets/furniture/chair.svg
