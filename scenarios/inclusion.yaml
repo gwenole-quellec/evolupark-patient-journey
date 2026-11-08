@@ -22,7 +22,7 @@ scene:
           from: left
           to:
             x: -1.0
-            bottom_y: -3.1
+            bottom_y: -3.3
 
     - id: seating
       narration: >
@@ -39,7 +39,7 @@ scene:
           from: right
           to:
             x: 4.75
-            bottom_y: -3.1
+            bottom_y: -3.3
 
         - action: sit_on
           character: patient
@@ -68,7 +68,7 @@ scene:
           x: 0.55
           y: -1.25
           width: 0.42
-          z_index: 6
+          z_index: 4
           facing: right
           animation:
             frames:
@@ -81,7 +81,7 @@ scene:
           x: 3.05
           y: -1.25
           width: 0.42
-          z_index: 6
+          z_index: 4
           facing: left
           animation:
             frames:

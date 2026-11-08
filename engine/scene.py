@@ -58,6 +58,9 @@ SCENARIO = Path(SCENARIO_ENV)
 if not SCENARIO.is_file():
     raise FileNotFoundError(f"Scenario not found: {SCENARIO}")
 
+TITLE_Z_INDEX = 1000
+TEXT_Z_INDEX = 999
+
 COMMON_CONFIG = ROOT / "config" / "common.yaml"
 with COMMON_CONFIG.open(encoding="utf-8") as f:
     common_cfg = yaml.safe_load(f) or {}
@@ -177,6 +180,7 @@ class EvoluParkScene(Scene):
                     load_character(name, "standing", direction)[0]
                 ]
 
+        z_index = obj.z_index
         current_key = None
 
         def update(mob, alpha):
@@ -219,7 +223,7 @@ class EvoluParkScene(Scene):
 
             if key != current_key:
                 mob.become(frames[frame_index])
-                mob.set_z_index(2)
+                mob.set_z_index(z_index)
                 current_key = key
 
             place_bottom(mob, x, y)
@@ -256,7 +260,7 @@ class EvoluParkScene(Scene):
         old = previous["mobject"]
         new, flipped = load_character(name, pose, facing)
         place_bottom(new, old.get_center()[0], old.get_bottom()[1])
-        new.set_z_index(2)
+        new.set_z_index(old.z_index)
         self.remove(old)
         self.add(new)
         self.people[name] = {
@@ -294,7 +298,7 @@ class EvoluParkScene(Scene):
         if title.width > 8.7:
             title.scale_to_fit_width(8.7)
         title.to_corner(UL, buff=0.4)
-        title.set_z_index(20)
+        title.set_z_index(TITLE_Z_INDEX)
         self.add(title)
         self.title = title
         self.current_text = None
@@ -306,7 +310,7 @@ class EvoluParkScene(Scene):
         logo = SVGMobject(str(logo_path))
         logo.scale_to_fit_width(float(logo_cfg.get("width", 1.65)))
         logo.to_corner(UR, buff=0.35)
-        logo.set_z_index(20)
+        logo.set_z_index(TITLE_Z_INDEX)
         self.add(logo)
 
         for sequence in scene_cfg["sequences"]:
@@ -334,6 +338,8 @@ class EvoluParkScene(Scene):
             return self.walk_to(action)
         elif kind == "parallel":
             return self.parallel(action)
+        elif kind == "set_z_index":
+            self.set_character_z_index(action)
         else:
             raise ValueError(f"Unknown action: {kind}")
 
@@ -408,7 +414,9 @@ class EvoluParkScene(Scene):
         facing = action.get("facing", "right")
 
         obj, flipped = load_character(name, pose, facing)
-        obj.set_z_index(2)
+        obj.set_z_index(int(
+            action.get("z_index", cfg["characters"][name]["z_index"])
+        ))
 
         if "chair" not in action:
             position = action.get("at", action)
@@ -472,14 +480,22 @@ class EvoluParkScene(Scene):
         if remaining > 0:
             self.wait(remaining)
 
+    def set_character_z_index(self, action):
+        """Change a character's rendering depth without replacing its pose."""
+        name = action["character"]
+
+        if name not in self.people:
+            raise ValueError(f"Character not on stage: {name}")
+
+        self.people[name]["mobject"].set_z_index(
+            int(action["z_index"])
+        )
+
     def show_illustration(self, action):
         """Show or replace a named scenario illustration."""
         name = action["id"]
 
-        obj, _ = build_svg_object({
-            "z_index": 8,
-            **action,
-        })
+        obj, _ = build_svg_object(action)
 
         previous = self.illustrations.pop(name, None)
 
@@ -513,7 +529,7 @@ class EvoluParkScene(Scene):
         # Position below the scene title, left-aligned.
         message.next_to(self.title, DOWN, buff=0.18)
         message.align_to(self.title, LEFT)
-        message.set_z_index(19)
+        message.set_z_index(TEXT_Z_INDEX)
 
         # Display immediately, without animation.
         self.add(message)
@@ -546,7 +562,7 @@ class EvoluParkScene(Scene):
         )
         current = anchor_point(new, character_anchor, flipped)
         new.shift(target - current)
-        new.set_z_index(2)
+        new.set_z_index(previous["mobject"].z_index)
 
         self.remove(previous["mobject"])
         self.add(new)
@@ -642,7 +658,9 @@ class EvoluParkScene(Scene):
             )
 
             place_bottom(obj, start_x, start_y)
-            obj.set_z_index(2)
+            obj.set_z_index(int(
+                action.get("z_index", cfg["characters"][name]["z_index"])
+            ))
             self.add(obj)
 
             self.people[name] = {

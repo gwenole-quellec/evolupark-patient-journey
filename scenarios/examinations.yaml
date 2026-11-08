@@ -42,7 +42,7 @@ scene:
           x: 1.85
           y: -1.25
           width: 0.4
-          z_index: 8
+          z_index: 4
 
     - id: handwriting
       narration: >
@@ -59,7 +59,7 @@ scene:
           y: -1.4
           width: 1.2
           facing: left
-          z_index: 8
+          z_index: 4
 
         - action: show_illustration
           id: camera
@@ -68,7 +68,7 @@ scene:
           y: -1.1
           width: 0.6
           facing: left
-          z_index: 8
+          z_index: 4
 
     - id: eye_tracking
       narration: >
@@ -87,7 +87,7 @@ scene:
           x: 1.2
           y: -1.0
           width: 1.0
-          z_index: 8
+          z_index: 4
 
     - id: walking
       narration: >
@@ -101,9 +101,80 @@ scene:
         - action: hide_illustration
           id: test
 
+        - action: set_z_index
+          character: patient
+          z_index: 5
+
+        - action: set_z_index
+          character: nurse
+          z_index: 5
+
+        - action: parallel
+          actions:
+
+          - action: walk_to
+            character: patient
+            facing: right
+            path:
+              - {x: -1.0, bottom_y: -3.3}
+              - {x: 8.5, bottom_y: -3.3}
+
+          - action: walk_to
+            character: nurse
+            facing: right
+            path:
+              - {x: 4.75, bottom_y: -3.3}
+              - {x: 8.5, bottom_y: -3.3}
+
+    - id: other_video
+      narration: >
+        Le détail de ces examens vous est présenté dans la vidéo suivante.
+        Puis nous recueillons des échantillons biologiques pour rechercher des marqueurs de la maladie.
+      actions:
+        - action: show_text
+          text: |-
+            Voir les détails dans
+            la vidéo suivante
+
+        - action: parallel
+          actions:
+
+          - action: walk_to
+            character: patient
+            facing: left
+            path:
+              - {x: 8.5, bottom_y: -3.3}
+              - {x: -1.0, bottom_y: -3.3}
+
+          - action: walk_to
+            character: nurse
+            facing: left
+            path:
+              - {x: 8.5, bottom_y: -3.3}
+              - {x: 4.75, bottom_y: -3.3}
+
+        - action: set_z_index
+          character: patient
+          z_index: 2
+
+        - action: set_z_index
+          character: nurse
+          z_index: 2
+
+        - action: sit_on
+          character: patient
+          chair: patient_chair
+          pose: sitting
+          facing: right
+
+        - action: sit_on
+          character: nurse
+          chair: neurologist_chair
+          pose: sitting
+          facing: left
+
     - id: biological_samples
       narration: >
-        Puis nous recueillons des échantillons biologiques pour rechercher des marqueurs de la maladie.
         Pour cela, nous prélevons de la salive, des larmes, du sang et de l'urine.
       actions:
         - action: show_text
@@ -117,7 +188,7 @@ scene:
           x: 2.5
           y: -1.25
           width: 0.65
-          z_index: 8
+          z_index: 4
 
     - id: octa1
       narration: >
@@ -130,6 +201,14 @@ scene:
         - action: hide_illustration
           id: test
 
+        - action: set_z_index
+          character: patient
+          z_index: 0
+
+        - action: set_z_index
+          character: nurse
+          z_index: 0
+
         - action: parallel
           actions:
 
@@ -138,15 +217,15 @@ scene:
             facing: left
             path:
               - {x: -1.0, bottom_y: -2.7}
-              - {x: -5.2, bottom_y: -1.75}
+              - {x: -5.2, bottom_y: -2.0}
 
           - action: walk_to
             character: nurse
             facing: left
             path:
               - {x: 4.75, bottom_y: -2.7}
-              - {x: 1.0, bottom_y: -1.75}
-              - {x: -1.0, bottom_y: -1.75}
+              - {x: 1.0, bottom_y: -2.1}
+              - {x: -1.0, bottom_y: -2.0}
 
         - action: sit_on
           character: patient
@@ -168,6 +247,15 @@ scene:
           text:  |-
             Imagerie de la rétine (OCT-A)
 
+    - id: questionnaires
+      narration: >
+        Lors de vos visites de suivi, nous récupérons aussi vos questionnaires, si vous avez choisi la version papier.
+      actions:
+        - action: show_text
+          text:  |-
+            Récupération des
+            questionnaires
+
         - action: parallel
           actions:
 
@@ -175,16 +263,24 @@ scene:
             character: patient
             facing: right
             path:
-              - {x: -5.2, bottom_y: -1.75}
+              - {x: -5.2, bottom_y: -2.0}
               - {x: -1.0, bottom_y: -2.7}
 
           - action: walk_to
             character: nurse
             facing: right
             path:
-              - {x: -1.0, bottom_y: -1.75}
-              - {x: 1.0, bottom_y: -1.75}
+              - {x: -1.0, bottom_y: -2.0}
+              - {x: 1.0, bottom_y: -2.1}
               - {x: 4.75, bottom_y: -2.7}
+
+        - action: set_z_index
+          character: patient
+          z_index: 2
+
+        - action: set_z_index
+          character: nurse
+          z_index: 2
 
         - action: sit_on
           character: patient
@@ -197,15 +293,6 @@ scene:
           chair: neurologist_chair
           pose: sitting
           facing: left
-
-    - id: questionnaires
-      narration: >
-        Lors de vos visites de suivi, nous récupérons aussi vos questionnaires, si vous avez choisi la version papier.
-      actions:
-        - action: show_text
-          text:  |-
-            Récupération des
-            questionnaires
 
     - id: next_appointment
       narration: >

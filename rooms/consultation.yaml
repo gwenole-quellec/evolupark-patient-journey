@@ -12,14 +12,14 @@ objects:
     x: 1.85
     y: 0.8
     width: 3.1
-    z_index: -15
+    z_index: -2
 
   - id: ophthalmic_device
     file: assets/devices/ophthalmic-imaging-device.svg
     x: -4.0
     bottom_y: -1.75
     height: 2.65
-    z_index: -5
+    z_index: -1
     facing: right
 
   - id: ophthalmic_stool
@@ -28,7 +28,7 @@ objects:
     x: -6.2
     bottom_y: -1.75
     height: 1.05
-    z_index: -4
+    z_index: -1
     anchors:
       seat: {x: 0.50, y: 0.75}
 
@@ -38,7 +38,7 @@ objects:
     x: -2.0
     bottom_y: -1.75
     height: 1.05
-    z_index: -4
+    z_index: -1
     anchors:
       seat: {x: 0.50, y: 0.75}
 
@@ -69,4 +69,4 @@ objects:
     x: 1.85
     bottom_y: -3.3
     width: 4.0
-    z_index: 4
+    z_index: 3

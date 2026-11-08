@@ -74,7 +74,7 @@ def build_svg_object(spec):
 
     native_facing = spec.get("native_facing", "right")
     facing = spec.get("facing", native_facing)
-    z_index = int(spec.get("z_index", 0))
+    z_index = int(spec["z_index"])
     opacity = float(spec.get("opacity", 1.0))
 
     frames = []
