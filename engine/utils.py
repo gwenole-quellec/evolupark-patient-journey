@@ -189,21 +189,18 @@ def anchor_point(obj, anchor, flipped=False):
     ])
 
 
-def place_bottom(obj, x, bottom_y):
+def place_bottom(obj, x, y):
     """Position a mobject using horizontal center and its bottom edge."""
     obj.set_x(float(x))
-    obj.shift((float(bottom_y) - obj.get_bottom()[1]) * UP)
+    obj.shift((float(y) - obj.get_bottom()[1]) * UP)
 
 
 def place_object(obj, spec):
-    """Place an asset using ``x`` and either ``bottom_y`` or center ``y``."""
-    if "bottom_y" in spec and "y" in spec:
-        raise ValueError("Use 'bottom_y' or 'y', not both")
+    """Place an asset using ``x`` and ``y``."""
     x = float(spec.get("x", 0))
-    if "bottom_y" in spec:
-        place_bottom(obj, x, spec["bottom_y"])
-    else:
-        obj.move_to([x, float(spec.get("y", 0)), 0])
+    if "y" in spec:
+        place_bottom(obj, x, spec["y"])
+        #obj.move_to([x, float(spec.get("y", 0)), 0])
 
 
 # ==============================================================================

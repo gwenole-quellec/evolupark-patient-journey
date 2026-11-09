@@ -40,7 +40,7 @@ scene:
           id: test
           file: assets/devices/audio-recorder.svg
           x: 1.85
-          y: -1.25
+          y: -1.5
           width: 0.4
           z_index: 4
 
@@ -56,7 +56,7 @@ scene:
           id: test
           file: assets/devices/graphic-tablet.svg
           x: 0.5
-          y: -1.4
+          y: -1.525
           width: 1.2
           facing: left
           z_index: 4
@@ -65,7 +65,7 @@ scene:
           id: camera
           file: assets/devices/camera-small-tripod.svg
           x: 1.3
-          y: -1.1
+          y: -1.55
           width: 0.6
           facing: left
           z_index: 4
@@ -85,7 +85,7 @@ scene:
           id: test
           file: assets/devices/monitor-eye-tracker.svg
           x: 1.2
-          y: -1.0
+          y: -1.55
           width: 1.0
           z_index: 4
 
@@ -103,7 +103,7 @@ scene:
 
         - action: set_z_index
           character: patient
-          z_index: 5
+          z_index: 6
 
         - action: set_z_index
           character: nurse
@@ -116,15 +116,16 @@ scene:
             character: patient
             facing: right
             path:
-              - {x: -1.0, bottom_y: -3.3}
-              - {x: 8.5, bottom_y: -3.3}
+              - location: next_to_left_seat
+              - location: waypoint1
+              - location: door
 
           - action: walk_to
             character: nurse
             facing: right
             path:
-              - {x: 4.75, bottom_y: -3.3}
-              - {x: 8.5, bottom_y: -3.3}
+              - location: next_to_right_seat
+              - location: door
 
     - id: other_video
       narration: >
@@ -143,15 +144,16 @@ scene:
             character: patient
             facing: left
             path:
-              - {x: 8.5, bottom_y: -3.3}
-              - {x: -1.0, bottom_y: -3.3}
+              - location: door
+              - location: waypoint1
+              - location: next_to_left_seat
 
           - action: walk_to
             character: nurse
             facing: left
             path:
-              - {x: 8.5, bottom_y: -3.3}
-              - {x: 4.75, bottom_y: -3.3}
+              - location: door
+              - location: next_to_right_seat
 
         - action: set_z_index
           character: patient
@@ -186,7 +188,7 @@ scene:
           id: test
           file: assets/devices/medical-sampling-case.svg
           x: 2.5
-          y: -1.25
+          y: -1.55
           width: 0.65
           z_index: 4
 
@@ -216,16 +218,16 @@ scene:
             character: patient
             facing: left
             path:
-              - {x: -1.0, bottom_y: -2.7}
-              - {x: -5.2, bottom_y: -2.0}
+              - location: behind_left_seat
+              - location: next_to_left_stool
 
           - action: walk_to
             character: nurse
             facing: left
             path:
-              - {x: 4.75, bottom_y: -2.7}
-              - {x: 1.0, bottom_y: -2.1}
-              - {x: -1.0, bottom_y: -2.0}
+              - location: behind_right_seat
+              - location: waypoint2
+              - location: next_to_right_stool
 
         - action: sit_on
           character: patient
@@ -263,16 +265,16 @@ scene:
             character: patient
             facing: right
             path:
-              - {x: -5.2, bottom_y: -2.0}
-              - {x: -1.0, bottom_y: -2.7}
+              - location: next_to_left_stool
+              - location: behind_left_seat
 
           - action: walk_to
             character: nurse
             facing: right
             path:
-              - {x: -1.0, bottom_y: -2.0}
-              - {x: 1.0, bottom_y: -2.1}
-              - {x: 4.75, bottom_y: -2.7}
+              - location: next_to_right_stool
+              - location: waypoint2
+              - location: behind_right_seat
 
         - action: set_z_index
           character: patient
@@ -305,9 +307,7 @@ scene:
         - action: stand_up
           character: nurse
           facing: left
-          to:
-            x: 4.75
-            bottom_y: -3.1
+          location: next_to_right_seat
 
         - action: change_pose
           character: nurse
@@ -317,6 +317,4 @@ scene:
         - action: stand_up
           character: patient
           facing: right
-          to:
-            x: -1.0
-            bottom_y: -3.1
+          location: next_to_left_seat

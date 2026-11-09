@@ -54,6 +54,71 @@ class Room:
             self._add_object(scene, entry)
         return self.objects
 
+    def resolve_position(self, spec):
+        """Resolve a named room location into explicit coordinates.
+
+        Accepts a coordinate mapping, a mapping containing 'location',
+        or a location name directly. Explicit coordinates remain valid.
+        """
+        if isinstance(spec, str):
+            spec = {"location": spec}
+
+        if not isinstance(spec, dict):
+            raise ValueError(f"Invalid position: {spec!r}")
+
+        if "location" not in spec:
+            return spec
+
+        name = spec["location"]
+        locations = self.definition.get("locations", {})
+
+        if name not in locations:
+            raise ValueError(
+                f"Unknown location {name!r} in room {self.source}"
+            )
+
+        position = locations[name]
+
+        if (
+            not isinstance(position, dict)
+            or "x" not in position
+            or "y" not in position
+        ):
+            raise ValueError(
+                f"Invalid coordinates for location {name!r}"
+            )
+
+        if any(key in spec for key in ("x", "y")):
+            raise ValueError(
+                f"Cannot mix location {name!r} with explicit coordinates"
+            )
+
+        return {
+            **{k: v for k, v in spec.items() if k != "location"},
+            **position,
+        }
+
+    def _add_object(self, scene, entry):
+        """Add a static or animated object to the room."""
+        if not isinstance(entry, dict) or "id" not in entry:
+            raise ValueError(f"Room object needs an 'id': {entry}")
+
+        name = entry["id"]
+
+        if name in self.objects:
+            raise ValueError(f"Duplicate object id in room: {name}")
+
+        obj, flipped = build_svg_object(entry)
+
+        scene.add(obj)
+
+        self.objects[name] = {
+            "mobject": obj,
+            "type": entry.get("type"),
+            "flipped": flipped,
+            "anchors": entry.get("anchors", {}),
+        }
+
     def _draw_room_surfaces(self, scene):
         """Render wall, floor and dividing line behind scenery and characters."""
         style = self.shared["style"]
@@ -93,24 +158,3 @@ class Room:
         horizon.set_z_index(-28)
         scene.add(horizon)
         self.floor_y = floor_y
-
-    def _add_object(self, scene, entry):
-        """Add a static or animated object to the room."""
-        if not isinstance(entry, dict) or "id" not in entry:
-            raise ValueError(f"Room object needs an 'id': {entry}")
-
-        name = entry["id"]
-
-        if name in self.objects:
-            raise ValueError(f"Duplicate object id in room: {name}")
-
-        obj, flipped = build_svg_object(entry)
-
-        scene.add(obj)
-
-        self.objects[name] = {
-            "mobject": obj,
-            "type": entry.get("type"),
-            "flipped": flipped,
-            "anchors": entry.get("anchors", {}),
-        }

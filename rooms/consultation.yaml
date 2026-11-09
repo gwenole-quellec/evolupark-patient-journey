@@ -10,14 +10,14 @@ objects:
   - id: harbor_picture
     file: assets/furniture/frame.svg
     x: 1.85
-    y: 0.8
+    y: -0.7
     width: 3.1
     z_index: -2
 
   - id: ophthalmic_device
     file: assets/devices/ophthalmic-imaging-device.svg
     x: -4.0
-    bottom_y: -1.75
+    y: -1.75
     height: 2.65
     z_index: -1
     facing: right
@@ -26,7 +26,7 @@ objects:
     type: chair
     file: assets/devices/ophthalmic-stool.svg
     x: -6.2
-    bottom_y: -1.75
+    y: -1.75
     height: 1.05
     z_index: -1
     anchors:
@@ -36,7 +36,7 @@ objects:
     type: chair
     file: assets/devices/ophthalmic-stool.svg
     x: -2.0
-    bottom_y: -1.75
+    y: -1.75
     height: 1.05
     z_index: -1
     anchors:
@@ -46,7 +46,7 @@ objects:
     type: chair
     file: assets/furniture/chair.svg
     x: -1.
-    bottom_y: -3.1
+    y: -3.1
     height: 1.85
     facing: right
     z_index: 1
@@ -57,7 +57,7 @@ objects:
     type: chair
     file: assets/furniture/chair.svg
     x: 4.75
-    bottom_y: -3.1
+    y: -3.1
     height: 1.85
     facing: left
     z_index: 1
@@ -67,6 +67,43 @@ objects:
   - id: examination_table
     file: assets/furniture/examination-table.svg
     x: 1.85
-    bottom_y: -3.3
+    y: -3.3
     width: 4.0
     z_index: 3
+
+locations:
+  next_to_left_seat:
+    x: -1.0
+    y: -3.3
+
+  next_to_right_seat:
+    x: 4.75
+    y: -3.3
+
+  door:
+    x: 8.5
+    y: -3.6
+
+  behind_left_seat:
+    x: -1.0
+    y: -2.7
+
+  behind_right_seat:
+    x: 4.75
+    y: -2.7
+
+  next_to_left_stool:
+    x: -5.2
+    y: -2.0
+
+  next_to_right_stool:
+    x: -1.0
+    y: -2.0
+
+  waypoint1:
+    x: 1.0
+    y: -3.5
+
+  waypoint2:
+    x: 1.0
+    y: -2.1

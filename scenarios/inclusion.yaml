@@ -19,7 +19,7 @@ scene:
         - action: show_illustration
           id: patient_mug
           x: 0.55
-          y: -1.25
+          y: -1.5
           width: 0.42
           z_index: 4
           facing: right
@@ -31,8 +31,8 @@ scene:
 
         - action: show_illustration
           id: neurologist_mug
-          x: 3.05
-          y: -1.25
+          x: 3.1
+          y: -1.5
           width: 0.42
           z_index: 4
           facing: left
@@ -47,9 +47,7 @@ scene:
           character: patient
           facing: right
           from: left
-          to:
-            x: -1.0
-            bottom_y: -3.3
+          location: next_to_left_seat
 
     - id: seating
       narration: >
@@ -59,13 +57,17 @@ scene:
           text: |-
             Rencontre avec la neurologue
 
+        - action: place_character
+          character: neurologist
+          pose: standing
+          facing: right
+          location: door
+
         - action: walk_to
           character: neurologist
           facing: left
           from: right
-          to:
-            x: 4.75
-            bottom_y: -3.3
+          location: next_to_right_seat
 
         - action: sit_on
           character: patient

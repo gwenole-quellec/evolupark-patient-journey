@@ -9,7 +9,7 @@ floor_y: -1.5
 objects:
   - id: window
     x: 0.
-    y: 1.6
+    y: 0.2
     height: 2.8
     z_index: 0
     animation:
@@ -24,7 +24,7 @@ objects:
   - id: left_tripod_lamp
     file: assets/devices/camera-large-tripod.svg
     x: -5.35
-    bottom_y: -2.0
+    y: -2.0
     height: 3.3
     z_index: 1
     facing: right
@@ -32,7 +32,7 @@ objects:
   - id: right_tripod_lamp
     file: assets/devices/camera-large-tripod.svg
     x: 5.35
-    bottom_y: -2.0
+    y: -2.0
     height: 3.3
     z_index: 1
     facing: left
@@ -40,7 +40,7 @@ objects:
   - id: cone1
     file: assets/furniture/cone.svg
     x: 1.0
-    bottom_y: -2.4
+    y: -2.4
     height: 0.7
     z_index: 1
     facing: left
@@ -48,7 +48,7 @@ objects:
   - id: cone2
     file: assets/furniture/cone.svg
     x: 0.7
-    bottom_y: -2.9
+    y: -2.9
     height: 0.7
     z_index: 3
     facing: left
@@ -57,9 +57,34 @@ objects:
     type: chair
     file: assets/furniture/chair.svg
     x: -3.5
-    bottom_y: -2.6
+    y: -2.6
     height: 1.8
     facing: right
     z_index: 1
     anchors:
       seat: {x: 0.42, y: 0.42}
+
+locations:
+  nurse_standing:
+    x: 4.5
+    y: -2.6
+
+  patient_standing:
+    x: -2.4
+    y: -2.6
+
+  patient_turning:
+    x: 2.5
+    y: -2.6
+
+  neurologist_entering:
+    x: -7.0
+    y: -2.8
+
+  neurologist_standing:
+    x: -0.8
+    y: -2.8
+
+  patient_facing_neurologist:
+    x: -2.6
+    y: -2.8

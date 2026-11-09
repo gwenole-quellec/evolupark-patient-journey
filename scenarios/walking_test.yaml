@@ -25,8 +25,7 @@ scene:
           character: nurse
           pose: standing_with_tablet
           facing: left
-          x: 4.5
-          bottom_y: -2.6
+          location: nurse_standing
 
     - id: stand_up
       narration: >
@@ -38,9 +37,7 @@ scene:
         - action: stand_up
           character: patient
           facing: right
-          to:
-            x: -2.4
-            bottom_y: -2.6
+          location: patient_standing
 
     - id: walk_forward
       narration: >
@@ -52,9 +49,7 @@ scene:
         - action: walk_to
           character: patient
           facing: right
-          to:
-            x: 2.5
-            bottom_y: -2.6
+          location: patient_turning
 
     - id: turn_back
       narration: >
@@ -71,9 +66,7 @@ scene:
         - action: walk_to
           character: patient
           facing: left
-          to:
-            x: -2.4
-            bottom_y: -2.6
+          location: patient_standing
 
     - id: sit_down
       narration: >
@@ -102,8 +95,7 @@ scene:
           character: neurologist
           pose: standing
           facing: right
-          x: -7.0
-          bottom_y: -2.8
+          location: neurologist_entering
 
         - action: set_z_index
           character: neurologist
@@ -112,9 +104,7 @@ scene:
         - action: walk_to
           character: neurologist
           facing: right
-          to:
-            x: -0.8
-            bottom_y: -2.8
+          location: neurologist_standing
 
         - action: change_pose
           character: neurologist
@@ -133,9 +123,7 @@ scene:
         - action: stand_up
           character: patient
           facing: right
-          to:
-            x: -2.6
-            bottom_y: -2.8
+          location: patient_facing_neurologist
 
     - id: updrs2
       narration: >

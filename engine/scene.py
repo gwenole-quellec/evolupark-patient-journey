@@ -86,9 +86,9 @@ class EvoluParkScene(Scene):
         self,
         obj,
         name,
+        waypoints,
+        run_time,
         facing=None,
-        run_time=1.0,
-        waypoints=None,
         defer=False,
     ):
         """Animate walking along a polyline at a specified duration.
@@ -317,7 +317,7 @@ class EvoluParkScene(Scene):
             self.run_sequence(sequence)
         self.wait(0.5)
 
-    def execute_action(self, action, run_time=0):
+    def execute_action(self, action):
         """Dispatch a YAML action and return its duration when applicable."""
         kind = action["action"]
         if kind == "show_illustration":
@@ -419,15 +419,13 @@ class EvoluParkScene(Scene):
         ))
 
         if "chair" not in action:
-            position = action.get("at", action)
+            position = self.room.resolve_position(action)
             x = float(position["x"])
-            bottom_y = float(
-                position.get(
-                    "bottom_y",
-                    self.room.definition.get("character_ground_y", -2.6),
-                )
-            )
-            place_bottom(obj, x, bottom_y)
+            y = float(position.get(
+                "y",
+                self.room.definition.get("character_ground_y", self.room.floor_y),
+            ))
+            place_bottom(obj, x, y)
 
         self.add(obj)
 
@@ -495,7 +493,7 @@ class EvoluParkScene(Scene):
         """Show or replace a named scenario illustration."""
         name = action["id"]
 
-        obj, _ = build_svg_object(action)
+        obj, _ = build_svg_object(self.room.resolve_position(action))
 
         previous = self.illustrations.pop(name, None)
 
@@ -589,15 +587,15 @@ class EvoluParkScene(Scene):
             "facing": facing,
         })
 
-        position = action["to"]
+        position = self.room.resolve_position(action.get("to", action))
         obj = self.people[name]["mobject"]
 
         place_bottom(
             obj,
             float(position["x"]),
             float(position.get(
-                "bottom_y",
-                self.room.definition.get("character_ground_y", -2.6),
+                "y",
+                self.room.definition.get("character_ground_y", self.room.floor_y),
             )),
         )
 
@@ -618,13 +616,22 @@ class EvoluParkScene(Scene):
 
         if "path" in action:
             targets = action["path"]
+        elif "to" in action:
+            targets = [action["to"]]
+        elif "location" in action:
+            targets = [action]
         else:
-            targets = [action.get("to")]
+            targets = []
 
         if not isinstance(targets, list) or not targets:
             raise ValueError(
-                f"{name}: walk_to requires a nonempty path"
+                f"{name}: walk_to requires a destination or path"
             )
+
+        targets = [
+            self.room.resolve_position(target)
+            for target in targets
+        ]
 
         for target in targets:
             if not isinstance(target, dict) or "x" not in target:
@@ -654,7 +661,7 @@ class EvoluParkScene(Scene):
                 config.frame_width / 2 + obj.width / 2 + 0.2
             )
             start_y = float(
-                targets[0].get("bottom_y", self.room.floor_y)
+                targets[0].get("y", self.room.floor_y)
             )
 
             place_bottom(obj, start_x, start_y)
@@ -683,7 +690,7 @@ class EvoluParkScene(Scene):
             last_y = waypoints[-1][1]
             waypoints.append((
                 float(target["x"]),
-                float(target.get("bottom_y", last_y)),
+                float(target.get("y", last_y)),
             ))
 
         # Distance along the complete trajectory, including waypoints.
@@ -734,9 +741,9 @@ class EvoluParkScene(Scene):
         result = self.animate_walk(
             obj=obj,
             name=name,
-            facing=facing,
             waypoints=waypoints,
             run_time=run_time,
+            facing=facing,
             defer=defer,
         )
 

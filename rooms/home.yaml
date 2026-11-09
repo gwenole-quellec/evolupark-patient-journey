@@ -9,7 +9,7 @@ floor_y: -1.5
 objects:
   - id: window
     x: 0.
-    y: 1.6
+    y: 0.2
     height: 2.8
     z_index: -1
     animation:
@@ -24,14 +24,14 @@ objects:
   - id: chest_of_drawers
     file: assets/furniture/chest-of-drawers.svg
     x: -4.6
-    bottom_y: -2.0
+    y: -2.0
     height: 1.6
     z_index: 0
 
   # Adjust bottom_y after measuring the actual top of the dresser SVG.
   - id: cat
     x: -4.6
-    bottom_y: -0.45
+    y: -0.45
     height: 1.05
     z_index: 1
     animation:
@@ -43,13 +43,22 @@ objects:
   - id: floor_lamp
     file: assets/furniture/floor-lamp.svg
     x: 4.0
-    bottom_y: -2.0
+    y: -2.0
     height: 3.2
     z_index: -1
 
   - id: desk
     file: assets/furniture/desktop.svg
     x: 0
-    bottom_y: -4.2
+    y: -4.2
     width: 8.0
     z_index: 2
+
+locations:
+  laptop:
+    x: -1.2
+    y: -4.3
+
+  mouse:
+    x: 2.3
+    y: -4.0
