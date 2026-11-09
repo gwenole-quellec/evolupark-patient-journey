@@ -88,3 +88,60 @@ scene:
           chair: walking_course_chair
           pose: sitting
           facing: right
+
+    - id: neurologist_arrives
+      narration: >
+        Lors de la visite d'inclusion, la neurologue évalue également votre motricité et vos fonctions cognitives.
+      actions:
+        - action: show_text
+          text: |-
+            Examens neurologiques :
+            UPDRS-III et MoCA
+
+        - action: place_character
+          character: neurologist
+          pose: standing
+          facing: right
+          x: -7.0
+          bottom_y: -2.8
+
+        - action: set_z_index
+          character: neurologist
+          z_index: 3
+
+        - action: walk_to
+          character: neurologist
+          facing: right
+          to:
+            x: -0.8
+            bottom_y: -2.8
+
+        - action: change_pose
+          character: neurologist
+          pose: standing
+          facing: left
+
+    - id: updrs1
+      narration: >
+        L'UPDRS-III mesure vos capacités motrices, tandis que le MoCA évalue notamment votre mémoire et votre attention.
+      actions:
+        - action: show_text
+          text: |-
+            Visite d'inclusion :
+            Évaluations par la neurologue
+
+        - action: stand_up
+          character: patient
+          facing: right
+          to:
+            x: -2.6
+            bottom_y: -2.8
+
+    - id: updrs2
+      narration: >
+        Lors des visites de suivi, ces évaluations sont reprises par l'infirmier pour observer leur évolution.
+      actions:
+        - action: show_text
+          text: |-
+            Visites de suivi :
+            Évaluations par l'infirmier

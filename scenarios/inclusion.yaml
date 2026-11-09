@@ -16,6 +16,33 @@ scene:
           text: |-
             Votre rendez-vous au CHU de Brest
 
+        - action: show_illustration
+          id: patient_mug
+          x: 0.55
+          y: -1.25
+          width: 0.42
+          z_index: 4
+          facing: right
+          animation:
+            frames:
+              - assets/furniture/coffee-mug1.svg
+              - assets/furniture/coffee-mug2.svg
+            period: 1.0
+
+        - action: show_illustration
+          id: neurologist_mug
+          x: 3.05
+          y: -1.25
+          width: 0.42
+          z_index: 4
+          facing: left
+          animation:
+            frames:
+              - assets/furniture/coffee-mug1.svg
+              - assets/furniture/coffee-mug2.svg
+            period: 1.0
+            phase: 0.5
+
         - action: walk_to
           character: patient
           facing: right
@@ -27,7 +54,6 @@ scene:
     - id: seating
       narration: >
         À votre arrivée, vous rencontrez une neurologue du CHU de Brest.
-        Vous vous installez pour échanger avec elle.
       actions:
         - action: show_text
           text: |-
@@ -55,37 +81,9 @@ scene:
     - id: consultation
       narration: >
         La neurologue vous explique les objectifs de l'étude, son déroulement et les examens prévus.
-        Elle répond à toutes vos questions.
-        Vous disposez du temps nécessaire pour réfléchir, avant de décider librement si vous souhaitez participer.
+        Elle répond à toutes vos questions, puis vous décidez librement si vous souhaitez participer.
       actions:
         - action: show_text
           text: |-
             Présentation de l'étude
             et temps de réflexion
-
-        - action: show_illustration
-          id: patient_mug
-          x: 0.55
-          y: -1.25
-          width: 0.42
-          z_index: 4
-          facing: right
-          animation:
-            frames:
-              - assets/furniture/coffee-mug1.svg
-              - assets/furniture/coffee-mug2.svg
-            period: 1.0
-
-        - action: show_illustration
-          id: neurologist_mug
-          x: 3.05
-          y: -1.25
-          width: 0.42
-          z_index: 4
-          facing: left
-          animation:
-            frames:
-              - assets/furniture/coffee-mug1.svg
-              - assets/furniture/coffee-mug2.svg
-            period: 1.0
-            phase: 0.5

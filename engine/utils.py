@@ -15,7 +15,7 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from manim import RIGHT, SVGMobject, UP
+from manim import RIGHT, SVGMobject, UP, VGroup, VMobject
 
 
 # ==============================================================================
@@ -264,43 +264,85 @@ def add_motion(obj, motion):
 
 
 def make_looping_svg(frames, *, period, initial_phase=0.0, z_index=0):
-    """Cycle through preloaded SVG frames using a Manim updater.
+    """Cycle through preloaded SVG frames by toggling their visibility.
 
-    Frames must already be scaled and positioned. No SVG is loaded
-    during animation.
+    All frames remain in a single group, preserving a constant bounding
+    box and avoiding structural changes during animation.
 
     Args:
-        frames: Preloaded SVG mobjects.
+        frames: Preloaded, positioned SVG mobjects.
         period: Duration of one complete cycle, in seconds.
         initial_phase: Initial offset within the cycle, in seconds.
         z_index: Rendering layer of the animated object.
 
     Returns:
-        A mobject with a non-blocking frame-cycling updater.
+        A VGroup with a non-blocking frame-cycling updater.
     """
     if not frames:
         raise ValueError("A looping animation needs at least one SVG frame")
+
     period = float(period)
     if period <= 0:
         raise ValueError("Animation period must be > 0")
 
+    group = VGroup(*frames)
+    group.set_z_index(z_index)
+
+    # Preserve the original fill and stroke opacities of every shape.
+    styles = [
+        [
+            (
+                part,
+                part.get_fill_opacity(),
+                part.get_stroke_opacity(),
+            )
+            for part in frame.get_family()
+            if isinstance(part, VMobject)
+        ]
+        for frame in frames
+    ]
+
+    def set_visible(index, visible):
+        """Toggle a frame without changing its geometry or colors."""
+        for part, fill, stroke in styles[index]:
+            part.set_fill(
+                opacity=fill if visible else 0,
+                family=False,
+            )
+            part.set_stroke(
+                opacity=stroke if visible else 0,
+                family=False,
+            )
+
     start_time = float(initial_phase) % period
     start_index = int(len(frames) * start_time / period)
-    shown = frames[start_index].copy()
-    shown.set_z_index(z_index)
-    if len(frames) == 1:
-        return shown
 
-    state = {"time": start_time, "index": start_index}
+    for i in range(len(frames)):
+        if i != start_index:
+            set_visible(i, False)
+
+    state = {
+        "time": start_time,
+        "index": start_index,
+    }
 
     def advance(mobject, dt):
-        """Switch SVG only when the discrete animation frame changes."""
-        state["time"] = (state["time"] + max(0.0, float(dt))) % period
-        next_index = int(len(frames) * state["time"] / period)
+        """Display the frame corresponding to the current cycle time."""
+        state["time"] = (
+            state["time"] + max(0.0, float(dt))
+        ) % period
+
+        next_index = int(
+            len(frames) * state["time"] / period
+        )
+
         if next_index != state["index"]:
-            mobject.become(frames[next_index])
-            mobject.set_z_index(z_index)
+            set_visible(state["index"], False)
+            set_visible(next_index, True)
             state["index"] = next_index
 
-    shown.add_updater(advance)
-    return shown
+    if len(frames) > 1:
+        group.add_updater(advance)
+
+    return group
+

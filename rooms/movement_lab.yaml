@@ -7,6 +7,20 @@ floor_color: "#E3E7EA"
 floor_y: -1.5
 
 objects:
+  - id: window
+    x: 0.
+    y: 1.6
+    height: 2.8
+    z_index: 0
+    animation:
+      frames:
+        - assets/furniture/lab-window1.svg
+        - assets/furniture/lab-window2.svg
+        - assets/furniture/lab-window3.svg
+        - assets/furniture/lab-window4.svg
+        - assets/furniture/lab-window5.svg
+      period: 6.0
+
   - id: left_tripod_lamp
     file: assets/devices/camera-large-tripod.svg
     x: -5.35
